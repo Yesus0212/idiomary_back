@@ -1,0 +1,17 @@
+{
+  "name": "idiomary_back",
+  "version": "1.0.0",
+  "description": "Servicios back (CRUD) Idiomary",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "author": "Jesus Solis",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "mongoose": "^6.1.4"
+  }
+}
