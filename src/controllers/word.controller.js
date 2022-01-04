@@ -6,7 +6,7 @@ async function getWord(request, response) {
         const filters = {};
     
         if(meaning) filters.meaning = { $regex: meaning };
-        if(word) filters.word = word;
+        if(word) filters.word = { $regex: word };
 
         const words = await Word.getWords(filters);
 

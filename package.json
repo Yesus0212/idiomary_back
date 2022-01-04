@@ -12,6 +12,15 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
-    "mongoose": "^6.1.4"
-  }
+    "mongoose": "^6.1.5",
+    "nodemon": "^2.0.15"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yesus0212/idiomary_back.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Yesus0212/idiomary_back/issues"
+  },
+  "homepage": "https://github.com/Yesus0212/idiomary_back#readme"
 }
