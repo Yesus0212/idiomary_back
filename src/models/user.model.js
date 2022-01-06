@@ -58,6 +58,10 @@ const userSchema = new mongoose.Schema({
             required: false,
         },
         countries:[{
+            id: {
+                type: mongoose.Types.ObjectId,
+                required: false,
+            },
             country: {
                 type: String,
                 minlegth: 2,
@@ -77,6 +81,6 @@ const userSchema = new mongoose.Schema({
     }],
 });
 
-const Word = mongoose.model('word', wordSchema)
+const User = mongoose.model('user', userSchema)
 
-module.exports = Word;
+module.exports = User;
