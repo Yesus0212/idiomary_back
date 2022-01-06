@@ -5,6 +5,7 @@ const word = require('../routers/words.router');
 const user = require('../routers/users.router');
 const topic = require('../routers/topics.router');
 const reason = require('../routers/reasons.router');
+const userType = require('../routers/userTypes.router');
 
 const logger = require('../middlewares/logger')
 
@@ -21,6 +22,7 @@ server.use('/words', word);
 server.use('/users', user);
 server.use('/topics', topic);
 server.use('/reasons', reason);
+server.use('/userTypes', userType);
 
 
 module.exports = server;

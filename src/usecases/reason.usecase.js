@@ -17,9 +17,10 @@ async function getReasonsById(request) {
 
 // Función de inserción de reason nuevo
 async function setReason(request) {
-    const {reason} = request;    
+    const {reason, type} = request;    
     const setReason = await Reason.create({
         reason,
+        type,
     });
     return setReason;
 }
