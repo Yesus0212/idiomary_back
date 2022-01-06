@@ -1,6 +1,6 @@
 const Word = require('../models/word.model');
 
-// Función de consulta de todos los Post y filtrado
+// Función de consulta de todos los Words y filtrado
 async function getWords(filters) {
     const words = await Word.find(filters);
     return words;
@@ -15,7 +15,7 @@ async function getWordsById(request) {
 }
 
 
-// Función de inserción de post nuevo
+// Función de inserción de word nuevo
 async function setWord(request) {
     const {word, meaning, example, urlImage, language, country, state, topic, addLanguages, createdAt, likes, reason, status, complements} = request;    
     const setWord = await Word.create({
@@ -37,7 +37,7 @@ async function setWord(request) {
     return setWord;
 }
 
-// Función de eliminación de post por ID
+// Función de eliminación de word por ID
 async function deleteWord(request) {
     const id = request;         
     const deleteWord = await Word.findByIdAndDelete(id);

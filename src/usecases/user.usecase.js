@@ -1,6 +1,6 @@
 const User = require('../models/user.model');
 
-// Función de consulta de todos los Post y filtrado
+// Función de consulta de todos los Users y filtrado
 async function getUsers(filters) {
     const users = await User.find(filters);
     return users;
@@ -15,7 +15,7 @@ async function getUsersById(request) {
 }
 
 
-// Función de inserción de post nuevo
+// Función de inserción de user nuevo
 async function setUser(request) {
     const {userName, email, password, language, country, state, urlImage, userType, points, filters} = request;    
     const setUser = await User.create({
@@ -33,7 +33,7 @@ async function setUser(request) {
     return setUser;
 }
 
-// Función de eliminación de post por ID
+// Función de eliminación de user por ID
 async function deleteUser(request) {
     const id = request;         
     const deleteUser = await User.findByIdAndDelete(id);
