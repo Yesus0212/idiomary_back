@@ -1,6 +1,6 @@
 const Topic = require('../models/topic.model');
 
-// Función de consulta de todos los Post y filtrado
+// Función de consulta de todos los Reason y filtrado
 async function getTopics(filters) {
     const topics = await Topic.find(filters);
     return topics;

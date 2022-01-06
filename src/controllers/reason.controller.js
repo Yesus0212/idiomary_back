@@ -1,17 +1,19 @@
-const Topic = require('../usecases/topic.usecase');
+const Reason = require('../usecases/reason.usecase');
 
-async function getTopic(request, response) {
+async function getReason(request, response) {
     try {
-        const {topic} = request.query;               
+        const {reason} = request.query;               
+        const {type} = request.query;
         const filters = {};
     
-        if(topic) filters.topic = { $regex: topic };        
+        if(reason) filters.reason = { $regex: reason };
+        if(type) filters.type = { $regex: type };
 
-        const topics = await Topic.getTopics(filters);
+        const reasons = await Reason.getReasons(filters);
 
         response.statusCode = 200;
         response.json({
-            topics
+            reasons
         })
     }
     catch(error) {
@@ -19,21 +21,21 @@ async function getTopic(request, response) {
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not get Topics',
+            message: 'Could not get Reasons',
             error
         });
     }
 };
 
-async function getTopicById(request, response) {
+async function getReasonById(request, response) {
     try {
         const id = request.params.id;
         
-        const topics = await Topic.getTopicsById(id);
+        const reasons = await Reason.getReasonsById(id);
 
         response.statusCode = 200;
         response.json({
-            topics
+            reasons
         })
     }
     catch(error) {
@@ -41,22 +43,22 @@ async function getTopicById(request, response) {
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not get Topic',
+            message: 'Could not get Reason',
             error
         });
     }
 };
 
 
-async function setTopic(request, response) {
+async function setReason(request, response) {
     try {
-        const newTopic = request.body;
-        const createTopic = await Topic.setTopic(newTopic);
+        const newReason = request.body;
+        const createReason = await Reason.setReason(newReason);
 
         response.statusCode = 200;
         response.json({
             success: true,
-            newTopic
+            newReason
         })
     }
     catch(error) {
@@ -64,23 +66,23 @@ async function setTopic(request, response) {
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not set new Topic',
+            message: 'Could not set new Reason',
             error
         });
     }
 };
 
 
-async function deleteTopic(request, response) {
+async function deleteReason(request, response) {
     try {
         const id = request.params.id;
 
-        const deleteTopic = await Topic.deleteTopic(id);
+        const deleteReason = await Reason.deleteReason(id);
 
         response.statusCode = 200;
         response.json({
             success: true,
-            deleteTopic
+            deleteReason
         })
     }
     catch(error) {
@@ -88,7 +90,7 @@ async function deleteTopic(request, response) {
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not delete a Topic',
+            message: 'Could not delete a Reason',
             error
         });
     }
@@ -96,8 +98,8 @@ async function deleteTopic(request, response) {
 
 
 module.exports = {
-    getTopic,
-    getTopicById,
-    setTopic,
-    deleteTopic,
+    getReason,
+    getReasonById,
+    setReason,
+    deleteReason,
 };
