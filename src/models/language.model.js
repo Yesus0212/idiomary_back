@@ -19,9 +19,12 @@ const languageSchema = new mongoose.Schema({
             required: true,
         },
         states: {
-            type: Map,
-            of: String,
-            required: true,
+            state: {
+                type: String,        
+                minlegth: 2,
+                maxlegth: 50,
+                required: true,
+            },
         },        
     }],
 });

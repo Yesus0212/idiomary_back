@@ -17,21 +17,23 @@ async function getWordsById(request) {
 
 // Función de inserción de word nuevo
 async function setWord(request) {
-    const {word, meaning, example, urlImage, language, country, state, topic, addLanguages, createdAt, likes, reason, status, complements} = request;    
+    const {word, meaning, example, userName, urlImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = request;    
     const setWord = await Word.create({
         word,
         meaning,
+        userName,
         example,
         urlImage,
         language,
         country,
         state,
         topic,
-        addLanguages, 
+        translations, 
         createdAt,
         likes,
-        reason,
+        userValidator,
         status,
+        reason,        
         complements
     });
     return setWord;

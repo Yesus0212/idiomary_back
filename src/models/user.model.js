@@ -3,12 +3,14 @@ const mongoose = require ('mongoose')
 const userSchema = new mongoose.Schema({
     userName: {
         type: String,
+        unique: true,
         minlegth: 2,
         required: true,
     },
     email: {
         type: String,
         minlegth: 2,
+        unique: true,
         required: true,
     },
     password: {
@@ -46,39 +48,32 @@ const userSchema = new mongoose.Schema({
         min: 1, 
         required: true,
     },
-    filters:[{
+    filters:{
         id: {
             type: mongoose.Types.ObjectId,
             required: false,
         },
         language: {
-            type: String,
-            minlegth: 2,
-            maxlegth: 25,
+            type: Map,
+            of: String,
             required: false,
         },
-        countries:[{
-            id: {
-                type: mongoose.Types.ObjectId,
-                required: false,
-            },
-            country: {
-                type: String,
-                minlegth: 2,
-                maxlegth: 50,
-                required: false,
-            },
-            states: {
-                type: Map,
-                of: String,
-                required: false
-            },
-            topic: {
-                type: String,
-                required: false,
-            },
-        }],
-    }],
+        countries: {
+            type: Map,
+            of: String,
+            required: false,
+        },
+        states: {
+            type: Map,
+            of: String,
+            required: false,
+        },
+        topics: {
+            type: Map,
+            of: String,
+            required: false,
+        },        
+    },
 });
 
 const User = mongoose.model('user', userSchema)

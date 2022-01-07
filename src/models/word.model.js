@@ -9,7 +9,11 @@ const wordSchema = new mongoose.Schema({
     type: {
         type: String,
         minlegth: 2,
-        required: false,
+        required: true,
+    },
+    userName: {
+        type: String,
+        required: true,
     },
     meaning: {
         type: String,
@@ -45,9 +49,13 @@ const wordSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    addLanguages:[{
+    translations:[{
         id: {
             type: mongoose.Types.ObjectId,
+            required: false,
+        },
+        userName: {
+            type: String,
             required: false,
         },
         language: {
@@ -57,6 +65,10 @@ const wordSchema = new mongoose.Schema({
             required: false,
         },
         meaning: {
+            type: String,
+            required: false,
+        },
+        userValidator: {
             type: String,
             required: false,
         },
@@ -71,6 +83,7 @@ const wordSchema = new mongoose.Schema({
     }],
     createdAt:{
         type: Date,
+        default: Date.now,
         required: true,
     },
     likes: {
@@ -78,19 +91,27 @@ const wordSchema = new mongoose.Schema({
         min: 0,
         required: true,
     },
-    reason: {
+    userValidator: {
         type: String,
-        minlength: 2,
-        required: true,
+        required: false,
     },
     status: {
         type: Number,
         min: 0,
         required: true,
     },
+    reason: {
+        type: String,
+        minlength: 2,
+        required: false,
+    },    
     complements:[{
         id: {
             type: mongoose.Types.ObjectId,
+            required: false,
+        },
+        userName: {
+            type: String,
             required: false,
         },
         meaning: {
@@ -127,9 +148,13 @@ const wordSchema = new mongoose.Schema({
             type: String,
             required: false,
         },  
-        addLanguages:[{
+        translations:[{
             id: {
                 type: mongoose.Types.ObjectId,
+                required: false,
+            },
+            userName: {
+                type: String,
                 required: false,
             },
             language: {
@@ -142,6 +167,10 @@ const wordSchema = new mongoose.Schema({
                 type: String,
                 required: false,
             },
+            userValidator: {
+                type: String,
+                required: false,
+            },
             status: {
                 type: Number,
                 required: false,
@@ -149,15 +178,20 @@ const wordSchema = new mongoose.Schema({
             reason: {
                 type: String,
                 required: false,
-            },    
+            },                
         }],  
         createdAt:{
             type: Date,
+            default: Date.now,
             required: false,
         },
         likes: {
             type: Number,
             min: 0,
+            required: false,
+        },
+        userValidator: {
+            type: String,
             required: false,
         },
         reason: {
