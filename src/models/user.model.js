@@ -49,27 +49,23 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     filters:{
-        id: {
-            type: mongoose.Types.ObjectId,
-            required: false,
-        },
-        language: {
-            type: Map,
+        languages: {
+            type: Array,
             of: String,
             required: false,
         },
         countries: {
-            type: Map,
+            type: Array,
             of: String,
             required: false,
         },
         states: {
-            type: Map,
+            type: Array,
             of: String,
             required: false,
         },
         topics: {
-            type: Map,
+            type: Array,
             of: String,
             required: false,
         },        

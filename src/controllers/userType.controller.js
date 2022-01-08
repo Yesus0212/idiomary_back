@@ -7,7 +7,7 @@ async function getUserType(request, response) {
         const filters = {};
     
         if(userType) filters.userType = { $regex: userType };
-        if(pointsToBe) filters.pointsToBe = { $regex: pointsToBe };
+        if(pointsToBe) filters.pointsToBe =  pointsToBe ;
 
         const userTypes = await UserType.getUserTypes(filters);
 

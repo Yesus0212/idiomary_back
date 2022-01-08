@@ -19,7 +19,7 @@ async function getLanguagesById(request) {
 async function setLanguage(request) {
     const {language, countries} = request;    
     const setLanguage = await Language.create({
-        language,
+        language, 
         countries,
     });
     return setLanguage;

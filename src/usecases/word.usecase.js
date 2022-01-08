@@ -17,9 +17,10 @@ async function getWordsById(request) {
 
 // Función de inserción de word nuevo
 async function setWord(request) {
-    const {word, meaning, example, userName, urlImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = request;    
+    const {word, type, meaning, example, userName, urlImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = request;    
     const setWord = await Word.create({
         word,
+        type,
         meaning,
         userName,
         example,

@@ -50,10 +50,6 @@ const wordSchema = new mongoose.Schema({
         required: true,
     },
     translations:[{
-        id: {
-            type: mongoose.Types.ObjectId,
-            required: false,
-        },
         userName: {
             type: String,
             required: false,
@@ -106,10 +102,6 @@ const wordSchema = new mongoose.Schema({
         required: false,
     },    
     complements:[{
-        id: {
-            type: mongoose.Types.ObjectId,
-            required: false,
-        },
         userName: {
             type: String,
             required: false,
@@ -149,10 +141,6 @@ const wordSchema = new mongoose.Schema({
             required: false,
         },  
         translations:[{
-            id: {
-                type: mongoose.Types.ObjectId,
-                required: false,
-            },
             userName: {
                 type: String,
                 required: false,
