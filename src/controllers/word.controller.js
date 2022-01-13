@@ -96,9 +96,38 @@ async function deleteWord(request, response) {
 };
 
 
+async function updateWord(request, response) {
+    try {
+        const id = request.params.id;
+        const complement = request.body;
+
+        // const updateWord = await Word.updateWord({id, word})
+
+        const updateComplement = await Word.updateComplement({id, complement});
+
+        response.statusCode = 200;
+        response.json({
+            success: true,
+            updateComplement
+        })
+
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not update a Word',
+            error
+        });
+    }
+}
+
+
 module.exports = {
     getWord,
     getWordById,
     setWord,
     deleteWord,
+    updateWord
 };

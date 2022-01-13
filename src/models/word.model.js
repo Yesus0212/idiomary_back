@@ -1,5 +1,105 @@
 const mongoose = require ('mongoose')
 
+const translationSchema = new mongoose.Schema(
+    {
+        userName: {
+            type: String,
+            required: false,
+        },
+        language: {
+            type: String,
+            minlegth: 2,
+            maxlegth: 25,
+            required: false,
+        },
+        meaning: {
+            type: String,
+            required: false,
+        },
+        userValidator: {
+            type: String,
+            required: false,
+        },
+        status: {
+            type: Number,
+            required: false,
+        },
+        reason: {
+            type: String,
+            required: false,
+        },    
+    }
+);
+
+
+const complementSchema = new mongoose.Schema(
+    {
+        userName: {
+            type: String,
+            required: false,
+        },
+        meaning: {
+            type: String,
+            required: false,
+        },
+        example: {
+            type: String,
+            required: false,
+        },
+        urlImage: {
+            type: String,
+            required: false,
+        },
+        language: {
+            type: String,
+            minlegth: 2,
+            maxlegth: 25,
+            required: false,
+        },
+        country: {
+            type: String,
+            minlegth: 2,
+            maxlegth: 50,
+            required: false,
+        },
+        state: {
+            type: String,        
+            minlegth: 2,
+            maxlegth: 50,
+            required: false,
+        },
+        topic: {
+            type: String,
+            required: false,
+        },  
+        translations:[translationSchema],  
+        createdAt:{
+            type: Date,
+            default: Date.now,
+            required: false,
+        },
+        likes: {
+            type: Number,
+            min: 0,
+            required: false,
+        },
+        userValidator: {
+            type: String,
+            required: false,
+        },
+        reason: {
+            type: String,
+            minlength: 2,
+            required: false,
+        },
+        status: {
+            type: Number,
+            min: 0,
+            required: false,
+        },
+    }
+);
+
 const wordSchema = new mongoose.Schema({
     word: {
         type: String,
@@ -49,34 +149,7 @@ const wordSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    translations:[{
-        userName: {
-            type: String,
-            required: false,
-        },
-        language: {
-            type: String,
-            minlegth: 2,
-            maxlegth: 25,
-            required: false,
-        },
-        meaning: {
-            type: String,
-            required: false,
-        },
-        userValidator: {
-            type: String,
-            required: false,
-        },
-        status: {
-            type: Number,
-            required: false,
-        },
-        reason: {
-            type: String,
-            required: false,
-        },    
-    }],
+    translations:[translationSchema],
     createdAt:{
         type: Date,
         default: Date.now,
@@ -101,99 +174,9 @@ const wordSchema = new mongoose.Schema({
         minlength: 2,
         required: false,
     },    
-    complements:[{
-        userName: {
-            type: String,
-            required: false,
-        },
-        meaning: {
-            type: String,
-            required: false,
-        },
-        example: {
-            type: String,
-            required: false,
-        },
-        urlImage: {
-            type: String,
-            required: false,
-        },
-        language: {
-            type: String,
-            minlegth: 2,
-            maxlegth: 25,
-            required: false,
-        },
-        country: {
-            type: String,
-            minlegth: 2,
-            maxlegth: 50,
-            required: false,
-        },
-        state: {
-            type: String,        
-            minlegth: 2,
-            maxlegth: 50,
-            required: false,
-        },
-        topic: {
-            type: String,
-            required: false,
-        },  
-        translations:[{
-            userName: {
-                type: String,
-                required: false,
-            },
-            language: {
-                type: String,
-                minlegth: 2,
-                maxlegth: 25,
-                required: false,
-            },
-            meaning: {
-                type: String,
-                required: false,
-            },
-            userValidator: {
-                type: String,
-                required: false,
-            },
-            status: {
-                type: Number,
-                required: false,
-            },
-            reason: {
-                type: String,
-                required: false,
-            },                
-        }],  
-        createdAt:{
-            type: Date,
-            default: Date.now,
-            required: false,
-        },
-        likes: {
-            type: Number,
-            min: 0,
-            required: false,
-        },
-        userValidator: {
-            type: String,
-            required: false,
-        },
-        reason: {
-            type: String,
-            minlength: 2,
-            required: false,
-        },
-        status: {
-            type: Number,
-            min: 0,
-            required: false,
-        },
-    }],
-});
+    complements:[complementSchema],
+},
+);
 
 const Word = mongoose.model('word', wordSchema)
 

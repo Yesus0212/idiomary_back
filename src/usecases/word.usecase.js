@@ -47,9 +47,65 @@ async function deleteWord(request) {
     return deleteWord;
 }
 
+
+// Función de actualización de language por ID
+async function updateWord(request) {
+    const id = request.id;
+    const data = request.word;
+
+    console.log(id, "id");
+    console.log(typeof(data), "data");
+
+    const updateLanguage = await Word.findByIdAndUpdate(id, data);
+
+    return updateLanguage;
+}
+
+async function updateComplement (request) {
+
+    console.log(request)
+
+
+    const updateComplement = await Word.findOneAndUpdate(
+      {
+        _id: request.id,
+      },
+      {
+        $set: { 'word.$.complements': request.complement },
+      },
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+  
+    if (updateComplement === null) {
+      await Word.findOneAndUpdate(
+        {
+          _id: request.id,
+        },
+        {
+          $addToSet: { "word.complements": [request.complement] },
+        },
+        {
+          upsert: true,
+          new: true,
+          runValidators: true,
+          useFindAndModify: false,
+        }
+      );
+    }
+    res.json('success');
+  };
+
+
+
 module.exports = {
     getWords,
     getWordsById,
     setWord,
     deleteWord,
+    updateWord,
+    updateComplement
 };
