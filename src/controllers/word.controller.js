@@ -96,16 +96,43 @@ async function deleteWord(request, response) {
 };
 
 
-async function updateWord(request, response) {
+async function setNewItemWord(request, response) {
     try {
         const id = request.params.id;
         const newArray = request.body;
 
+        // Se utiliza para agregar un nuevo elemento a de traducción o complemento a la palabra
+        const updateComplement = await Word.setNewItem({id, newArray});
+
+        response.statusCode = 200;
+        response.json({
+            success: true,
+            updateComplement
+        })
+
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not update a Word',
+            error
+        });
+    }
+}
+
+
+async function updateFieldWord(request, response) {
+    try {
+        const id = request.params.id;
+        const {idCom, newArray} = request.body;
+
         // const updateWord = await Word.updateWord({id, word})
 
-        const updateComplement = await Word.updateComplement({id, newArray});
+        // const updateComplement = await Word.updateComplement({id, newArray});
 
-        // const updateComplement = await Word.updateArray({id, newArray});
+        const updateComplement = await Word.updateArray({id, idCom, newArray});
 
         response.statusCode = 200;
         response.json({
@@ -131,5 +158,6 @@ module.exports = {
     getWordById,
     setWord,
     deleteWord,
-    updateWord
+    setNewItemWord,
+    updateFieldWord
 };

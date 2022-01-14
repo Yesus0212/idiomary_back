@@ -1,4 +1,4 @@
-const { trusted } = require('mongoose');
+const { trusted, isValidObjectId } = require('mongoose');
 const Word = require('../models/word.model');
 
 // Función de consulta de todos los Words y filtrado
@@ -49,7 +49,7 @@ async function deleteWord(request) {
 }
 
 // Función de actualización del registro
-async function updateComplement (request) {
+async function setNewItem (request) {
 
   const {id, newArray} = request;
 
@@ -58,7 +58,7 @@ async function updateComplement (request) {
       _id: id,
     },
     {
-      $push: { newArray},
+      $push: { newArray },
     },
     {
       new: true,
@@ -74,14 +74,22 @@ async function updateComplement (request) {
 // Función de actualización del registro
 async function updateArray (request) {
 
-  const {id, newArray} = request;
+  const {id, idCom, newArray} = request;
 
   const updateComplement = await Word.updateOne(
     {
       _id: id,
     },
     {
-      $push: {'complements.$[com]': {translations: newArray}},
+      $push: {"complements.$[com].translations" : newArray},
+    },
+    { 
+      arrayFilters: [
+        {"com._id": idCom},
+      ],     
+      new: true,
+      useFindAndModify: true,
+      returnNewDocument: true,
     }
   );
    
@@ -95,6 +103,6 @@ module.exports = {
     getWordsById,
     setWord,
     deleteWord,
-    updateComplement,
+    setNewItem,
     updateArray
 };
