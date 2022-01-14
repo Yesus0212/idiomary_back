@@ -81,10 +81,12 @@ async function updateArray (request) {
       _id: id,
     },
     {
+      // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
       $push: {"complements.$[com].translations" : newArray},
     },
     { 
       arrayFilters: [
+        // Se requiere un filtro adicional para identificar el complemento a modificar
         {"com._id": idCom},
       ],     
       new: true,
