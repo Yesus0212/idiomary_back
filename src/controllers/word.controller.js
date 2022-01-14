@@ -105,6 +105,8 @@ async function updateWord(request, response) {
 
         const updateComplement = await Word.updateComplement({id, newArray});
 
+        // const updateComplement = await Word.updateArray({id, newArray});
+
         response.statusCode = 200;
         response.json({
             success: true,

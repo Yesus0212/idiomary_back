@@ -58,13 +58,30 @@ async function updateComplement (request) {
       _id: id,
     },
     {
-      $push: newArray,
+      $push: { newArray},
     },
     {
       new: true,
       runValidators: true,
       useFindAndModify: true,
       returnNewDocument: true,
+    }
+  );
+   
+  return updateComplement;
+};
+
+// Función de actualización del registro
+async function updateArray (request) {
+
+  const {id, newArray} = request;
+
+  const updateComplement = await Word.updateOne(
+    {
+      _id: id,
+    },
+    {
+      $push: {'complements.$[com]': {translations: newArray}},
     }
   );
    
@@ -78,5 +95,6 @@ module.exports = {
     getWordsById,
     setWord,
     deleteWord,
-    updateComplement
+    updateComplement,
+    updateArray
 };
