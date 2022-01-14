@@ -99,11 +99,11 @@ async function deleteWord(request, response) {
 async function updateWord(request, response) {
     try {
         const id = request.params.id;
-        const complement = request.body;
+        const newArray = request.body;
 
         // const updateWord = await Word.updateWord({id, word})
 
-        const updateComplement = await Word.updateComplement({id, complement});
+        const updateComplement = await Word.updateComplement({id, newArray});
 
         response.statusCode = 200;
         response.json({

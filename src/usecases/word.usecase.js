@@ -1,3 +1,4 @@
+const { trusted } = require('mongoose');
 const Word = require('../models/word.model');
 
 // Función de consulta de todos los Words y filtrado
@@ -47,57 +48,28 @@ async function deleteWord(request) {
     return deleteWord;
 }
 
-
-// Función de actualización de language por ID
-async function updateWord(request) {
-    const id = request.id;
-    const data = request.word;
-
-    console.log(id, "id");
-    console.log(typeof(data), "data");
-
-    const updateLanguage = await Word.findByIdAndUpdate(id, data);
-
-    return updateLanguage;
-}
-
+// Función de actualización del registro
 async function updateComplement (request) {
 
-    console.log(request)
+  const {id, newArray} = request;
 
-
-    const updateComplement = await Word.findOneAndUpdate(
-      {
-        _id: request.id,
-      },
-      {
-        $set: { 'word.$.complements': request.complement },
-      },
-      {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-      }
-    );
-  
-    if (updateComplement === null) {
-      await Word.findOneAndUpdate(
-        {
-          _id: request.id,
-        },
-        {
-          $addToSet: { "word.complements": [request.complement] },
-        },
-        {
-          upsert: true,
-          new: true,
-          runValidators: true,
-          useFindAndModify: false,
-        }
-      );
+  const updateComplement = await Word.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    {
+      $push: newArray,
+    },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: true,
+      returnNewDocument: true,
     }
-    res.json('success');
-  };
+  );
+   
+  return updateComplement;
+};
 
 
 
@@ -106,6 +78,5 @@ module.exports = {
     getWordsById,
     setWord,
     deleteWord,
-    updateWord,
     updateComplement
 };

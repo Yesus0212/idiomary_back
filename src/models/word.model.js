@@ -89,7 +89,6 @@ const complementSchema = new mongoose.Schema(
         },
         reason: {
             type: String,
-            minlength: 2,
             required: false,
         },
         status: {
