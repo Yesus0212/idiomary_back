@@ -7,6 +7,7 @@ router.get('/', wordController.getWord);
 router.get('/:id', wordController.getWordById);
 router.post('/', wordController.setWord);
 router.delete('/:id', wordController.deleteWord);
-router.patch('/:id', wordController.setNewItemWord);
+router.patch('/newItem/:id', wordController.setNewItemWord);
+router.patch('/updateStatus/:id', wordController.updateStatusWord);
 
 module.exports = router;

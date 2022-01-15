@@ -12,7 +12,7 @@ const translationSchema = new mongoose.Schema(
             maxlegth: 25,
             required: false,
         },
-        trasnslate: {
+        translate: {
             type: String,
             required: false,
         },

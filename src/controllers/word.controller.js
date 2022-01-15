@@ -95,14 +95,14 @@ async function deleteWord(request, response) {
     }
 };
 
-
+// Función para agregar elementos nuevos a una palabra existente (función definitiva)
 async function setNewItemWord(request, response) {
     try {
         const id = request.params.id;
-        const newArray = request.body;
+        const { action, idComplement, newArray} = request.body;
 
         // Se utiliza para agregar un nuevo elemento a de traducción o complemento a la palabra
-        const updateComplement = await Word.setNewItem({id, newArray});
+        const updateComplement = await Word.setNewItem({id, action, idComplement, newArray});
 
         response.statusCode = 200;
         response.json({
@@ -123,16 +123,13 @@ async function setNewItemWord(request, response) {
 }
 
 
-async function updateFieldWord(request, response) {
+// Función para actualizar el estatus de una palabra
+async function updateStatusWord(request, response) {
     try {
         const id = request.params.id;
-        const {idCom, newArray} = request.body;
+        const {idComplement, idTranslate, nameValidator, status, reason} = request.body;
 
-        // const updateWord = await Word.updateWord({id, word})
-
-        // const updateComplement = await Word.updateComplement({id, newArray});
-
-        const updateComplement = await Word.updateArray({id, idCom, newArray});
+        const updateComplement = await Word.updateStatus({id, idComplement, idTranslate, nameValidator, status, reason});
 
         response.statusCode = 200;
         response.json({
@@ -159,5 +156,5 @@ module.exports = {
     setWord,
     deleteWord,
     setNewItemWord,
-    updateFieldWord
+    updateStatusWord
 };

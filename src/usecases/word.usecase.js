@@ -48,52 +48,140 @@ async function deleteWord(request) {
     return deleteWord;
 }
 
-// Función de actualización del registro
+// Esta función, permite agregar una traducción, complemento nuevo a una palabra dada o agregar una nueva traducción a un complemento dado
 async function setNewItem (request) {
 
-  const {id, newArray} = request;
+  const {id, action, idComplement, newArray} = request;
 
-  const updateComplement = await Word.findOneAndUpdate(
-    {
-      _id: id,
-    },
-    {
-      $push: { newArray },
-    },
-    {
-      new: true,
-      runValidators: true,
-      useFindAndModify: true,
-      returnNewDocument: true,
-    }
-  );
+  let updateComplement;
+
+  switch (action) {
+    case "translate":
+      if(idComplement !== ""){
+        updateComplement = await Word.findOneAndUpdate(
+          {
+            _id: id,
+          },
+          {
+            // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+            $push: {"complements.$[com].translations" : newArray},
+          },
+          { 
+            arrayFilters: [
+              // Se requiere un filtro adicional para identificar el complemento a modificar
+              {"com._id": idComplement},
+            ],     
+            new: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
+          }
+        );
+      }
+      else{
+        updateComplement = await Word.findOneAndUpdate(
+          {
+            _id: id,
+          },
+          {
+            $push: {translations: newArray} ,
+          },
+          {
+            new: true,
+            runValidators: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
+          }
+        );
+      }
+      break;
+    case "complement":
+      updateComplement = await Word.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+          $push: {complements : newArray},
+        },
+        {               
+          new: true,
+          useFindAndModify: true,
+          returnNewDocument: true,
+        }
+      );    
+      break;
+  
+    default:
+      return "Invalid action";
+  } 
    
   return updateComplement;
 };
 
-// Función de actualización del registro
-async function updateArray (request) {
 
-  const {id, idCom, newArray} = request;
+// Función de actualización del estatus del documento
+async function updateStatus (request) {
 
-  const updateComplement = await Word.updateOne(
-    {
-      _id: id,
-    },
-    {
-      // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-      $push: {"complements.$[com].translations" : newArray},
-    },
-    { 
-      arrayFilters: [
-        // Se requiere un filtro adicional para identificar el complemento a modificar
-        {"com._id": idCom},
-      ],     
-      new: true,
-      useFindAndModify: true,
-      returnNewDocument: true,
+    const {id, idComplement, idTranslate, nameValidator, status, reason} = request;
+
+    let updateWord;
+    let bulk = Word.bulkWrite()
+    
+    if(idComplement !== ""){
+      if(idTranslate !== ""){
+
+        bulk.find(
+          { 
+            _id: id
+          }, 
+          {
+          // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+          $set: {
+            "complements.$[com].userValidator" : nameValidator, 
+            "complements.$[com].reason" : reason,
+            "complements.$[com].status" : status,
+          }
+        },
+        { 
+          arrayFilters: [
+            // Se requiere un filtro adicional para identificar el complemento a modificar
+            {"com._id": idComplement},
+            {"com.status": "1" }
+          ],     
+          new: true,
+          useFindAndModify: true,
+          returnNewDocument: true,
+        } )
+
+        updateWord = await Word.findOneAndUpdate(
+          {
+            _id: id,
+          },
+          {
+            // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+            $set: {
+              "complements.$[com].userValidator" : nameValidator, 
+              "complements.$[com].reason" : reason,
+              "complements.$[com].status" : status,
+              "complements.$[com].translations.$[tra].userValidator" : nameValidator, 
+              "complements.$[com].translations.$[tra].reason" : reason,
+              "complements.$[com].translations.$[tra].status" : status
+            }
+          },
+          { 
+            arrayFilters: [
+              // Se requiere un filtro adicional para identificar el complemento a modificar
+              {"com._id": idComplement},
+              {"com.status": "1" },
+              {"tra._id": idTranslate}
+            ],     
+            new: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
+          }
+        );
+      }
     }
-  );
    
   return updateComplement;
 };
@@ -106,5 +194,5 @@ module.exports = {
     setWord,
     deleteWord,
     setNewItem,
-    updateArray
+    updateStatus
 };
