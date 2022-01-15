@@ -125,34 +125,34 @@ async function updateStatus (request) {
     const {id, idComplement, idTranslate, nameValidator, status, reason} = request;
 
     let updateWord;
-    let bulk = Word.bulkWrite()
-    
+   
     if(idComplement !== ""){
       if(idTranslate !== ""){
-
-        bulk.find(
-          { 
-            _id: id
-          }, 
+        updateWord = await Word.findOneAndUpdate(
           {
-          // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-          $set: {
-            "complements.$[com].userValidator" : nameValidator, 
-            "complements.$[com].reason" : reason,
-            "complements.$[com].status" : status,
+            _id: id,
+          },
+          {
+            // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+            $set: {
+              "complements.$[com].translations.$[tra].userValidator" : nameValidator, 
+              "complements.$[com].translations.$[tra].reason" : reason,
+              "complements.$[com].translations.$[tra].status" : status
+            }
+          },
+          { 
+            arrayFilters: [
+              // Se requiere un filtro adicional para identificar el complemento a modificar
+              {"com._id": idComplement},
+              {"tra._id": idTranslate}
+            ],     
+            new: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
           }
-        },
-        { 
-          arrayFilters: [
-            // Se requiere un filtro adicional para identificar el complemento a modificar
-            {"com._id": idComplement},
-            {"com.status": "1" }
-          ],     
-          new: true,
-          useFindAndModify: true,
-          returnNewDocument: true,
-        } )
-
+        );
+      }
+      else{
         updateWord = await Word.findOneAndUpdate(
           {
             _id: id,
@@ -163,17 +163,12 @@ async function updateStatus (request) {
               "complements.$[com].userValidator" : nameValidator, 
               "complements.$[com].reason" : reason,
               "complements.$[com].status" : status,
-              "complements.$[com].translations.$[tra].userValidator" : nameValidator, 
-              "complements.$[com].translations.$[tra].reason" : reason,
-              "complements.$[com].translations.$[tra].status" : status
             }
           },
           { 
             arrayFilters: [
               // Se requiere un filtro adicional para identificar el complemento a modificar
-              {"com._id": idComplement},
-              {"com.status": "1" },
-              {"tra._id": idTranslate}
+              {"com._id": idComplement}
             ],     
             new: true,
             useFindAndModify: true,
@@ -181,6 +176,26 @@ async function updateStatus (request) {
           }
         );
       }
+    }
+    else{
+      updateWord = await Word.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+          $set: {
+            userValidator : nameValidator, 
+            reason : reason,
+            status : status,
+          }
+        },
+        {     
+          new: true,
+          useFindAndModify: true,
+          returnNewDocument: true,
+        }
+      );
     }
    
   return updateComplement;
