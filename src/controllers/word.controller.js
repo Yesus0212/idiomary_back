@@ -149,6 +149,47 @@ async function updateStatusWord(request, response) {
     }
 }
 
+async function getFilters(request, response) {
+    try {
+
+    // {$or: [{country: ""}, {country: "Colombia"},{topic: "Expresiones despectivas"}]}
+
+
+        const {languages, countries, states, topics} = request.body;       
+        
+        const filters = {};
+
+        if(languages !== null){
+            filters.language = languages.forEach(lan => {
+               return language: lan
+            })
+        }
+
+        console.log(filters.language)
+
+        // filters.language = [language];
+        // filters.country = [country];
+        // filters.topic = [topic]
+        // filters.state = [state];
+    
+        // const words = await Word.getWords(find);
+
+        response.statusCode = 200;
+        response.json({
+            filters
+        })
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not get Words',
+            error
+        });
+    }
+};
+
 
 module.exports = {
     getWord,
@@ -156,5 +197,6 @@ module.exports = {
     setWord,
     deleteWord,
     setNewItemWord,
-    updateStatusWord
+    updateStatusWord,
+    getFilters
 };

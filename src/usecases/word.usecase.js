@@ -3,6 +3,7 @@ const Word = require('../models/word.model');
 
 // Función de consulta de todos los Words y filtrado
 async function getWords(filters) {
+  console.log(filters)
     const words = await Word.find(filters);
     return words;
 }
