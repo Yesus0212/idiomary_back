@@ -2,7 +2,8 @@ const Word = require('../models/word.model');
 
 // Función de consulta de todos los Words y filtrado
 async function getWords(filters) {
-    const words = await Word.find(filters);
+    const words = await Word.find()
+                            .or(filters);
     return words;
 }
 
