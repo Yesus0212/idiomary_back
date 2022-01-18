@@ -3,7 +3,19 @@ const Word = require('../usecases/word.usecase');
 async function getWord(request, response) {
     try {
         
-        const {search, languages, countries, states, topics} = request.body; 
+        const {languages, countries, states, topics} = request.body; 
+
+        // const filters = {};
+
+        // if(search){
+        //     filters.meaning = { $regex: search };
+        //     filters.word = { $regex: search };
+        // } 
+        // if(language.length) filters.language = language;
+        // if(country.length) filters.country = country;
+        // if(state.length) filters.state = state;
+        // if(topic.length) filters.topic = topic;
+
 
         let langs;
         let counts;
@@ -26,13 +38,22 @@ async function getWord(request, response) {
             return {"topic": element};
         })
 
+        const words = await Word.getWords(langs, counts, sts, top);
 
-        console.log({$or: [{word: {$regex:search}}]},
-            {$or: [{meaning: {$regex:search}}]},
-            {$or: [{example: {$regex:search}}]},)
+        // console.log(filters);
+
+        // const words = await Word.getWords(filters);
 
 
-        const words = await Word.getWords(search, langs, counts, sts, top);
+        // Ejemplo de envío
+        // {
+        //     "languages":[""],
+        //     "countries":["Colombia"],
+        //     "states":[""],
+        //     "topics":["Expresiones despectivas"]
+        // }
+
+
 
         response.statusCode = 200;
         response.json({
