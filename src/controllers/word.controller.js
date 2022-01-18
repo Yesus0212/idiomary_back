@@ -2,13 +2,31 @@ const Word = require('../usecases/word.usecase');
 
 async function getWord(request, response) {
     try {
-        const {word, meaning} = request.query;               
-        const filters = {};
-    
-        if(meaning) filters.meaning = { $regex: meaning };
-        if(word) filters.word = { $regex: word };
+        
+        const {search, languages, countries, states, topics} = request.body; 
 
-        const words = await Word.getWords(filters);
+        let langs;
+        let counts;
+        let sts;
+        let top;
+
+        langs = languages.map(element => {
+             return {"language": element};      
+        });
+
+        counts = countries.map(element => {
+            return {"country": element};      
+        });  
+
+        sts = states.map(element => {
+            return {"state": element};
+        })
+
+        top = topics.map(element => {
+            return {"topic": element};
+        })
+
+        const words = await Word.getWords(search, langs, counts, sts, top);
 
         response.statusCode = 200;
         response.json({
