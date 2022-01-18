@@ -3,55 +3,7 @@ const Word = require('../usecases/word.usecase');
 async function getWord(request, response) {
     try {
         
-        const {languages, countries, states, topics} = request.body; 
-
-        // const filters = {};
-
-        // if(search){
-        //     filters.meaning = { $regex: search };
-        //     filters.word = { $regex: search };
-        // } 
-        // if(language.length) filters.language = language;
-        // if(country.length) filters.country = country;
-        // if(state.length) filters.state = state;
-        // if(topic.length) filters.topic = topic;
-
-
-        let langs;
-        let counts;
-        let sts;
-        let top;
-
-        langs = languages.map(element => {
-             return {"language": element};      
-        });
-
-        counts = countries.map(element => {
-            return {"country": element};      
-        });  
-
-        sts = states.map(element => {
-            return {"state": element};
-        })
-
-        top = topics.map(element => {
-            return {"topic": element};
-        })
-
-        const words = await Word.getWords(langs, counts, sts, top);
-
-        // console.log(filters);
-
-        // const words = await Word.getWords(filters);
-
-
-        // Ejemplo de envío
-        // {
-        //     "languages":[""],
-        //     "countries":["Colombia"],
-        //     "states":[""],
-        //     "topics":["Expresiones despectivas"]
-        // }
+        
 
 
 
@@ -197,27 +149,55 @@ async function updateStatusWord(request, response) {
 async function getFilters(request, response) {
     try {
 
-    // {$or: [{country: ""}, {country: "Colombia"},{topic: "Expresiones despectivas"}]}
+        const {languages, countries, states, topics} = request.body; 
+
+        // const filters = {};
+
+        // if(search){
+        //     filters.meaning = { $regex: search };
+        //     filters.word = { $regex: search };
+        // } 
+        // if(language.length) filters.language = language;
+        // if(country.length) filters.country = country;
+        // if(state.length) filters.state = state;
+        // if(topic.length) filters.topic = topic;
 
 
-        // const {languages, countries, states, topics} = request.body;       
-        
-        const filters = {};
+        let langs;
+        let counts;
+        let sts;
+        let top;
 
-        // if(languages !== null){
-        //     filters.language = languages.forEach(lan => {
-        //        return language: lan
-        //     })
+        langs = languages.map(element => {
+             return {"language": element};      
+        });
+
+        counts = countries.map(element => {
+            return {"country": element};      
+        });  
+
+        sts = states.map(element => {
+            return {"state": element};
+        })
+
+        top = topics.map(element => {
+            return {"topic": element};
+        })
+
+        const words = await Word.getWords(langs, counts, sts, top);
+
+        // console.log(filters);
+
+        // const words = await Word.getWords(filters);
+
+
+        // Ejemplo de envío
+        // {
+        //     "languages":[""],
+        //     "countries":["Colombia"],
+        //     "states":[""],
+        //     "topics":["Expresiones despectivas"]
         // }
-
-        // console.log(filters.language)
-
-        // filters.language = [language];
-        // filters.country = [country];
-        // filters.topic = [topic]
-        // filters.state = [state];
-    
-        // const words = await Word.getWords(find);
 
         response.statusCode = 200;
         response.json({
