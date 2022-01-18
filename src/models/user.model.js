@@ -1,5 +1,30 @@
 const mongoose = require ('mongoose')
 
+const filterSchema = new mongoose.Schema(
+    {
+        languages: {
+            type: Array,
+            of: String,
+            required: false,
+        },
+        countries: {
+            type: Array,
+            of: String,
+            required: false,
+        },
+        states: {
+            type: Array,
+            of: String,
+            required: false,
+        },
+        topics: {
+            type: Array,
+            of: String,
+            required: false,
+        },        
+    }
+);
+
 const userSchema = new mongoose.Schema({
     userName: {
         type: String,
@@ -48,28 +73,7 @@ const userSchema = new mongoose.Schema({
         min: 1, 
         required: true,
     },
-    filters:{
-        languages: {
-            type: Array,
-            of: String,
-            required: false,
-        },
-        countries: {
-            type: Array,
-            of: String,
-            required: false,
-        },
-        states: {
-            type: Array,
-            of: String,
-            required: false,
-        },
-        topics: {
-            type: Array,
-            of: String,
-            required: false,
-        },        
-    },
+    filters: filterSchema,
 });
 
 const User = mongoose.model('user', userSchema)
