@@ -26,6 +26,12 @@ async function getWord(request, response) {
             return {"topic": element};
         })
 
+
+        console.log({$or: [{word: {$regex:search}}]},
+            {$or: [{meaning: {$regex:search}}]},
+            {$or: [{example: {$regex:search}}]},)
+
+
         const words = await Word.getWords(search, langs, counts, sts, top);
 
         response.statusCode = 200;

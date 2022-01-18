@@ -6,10 +6,9 @@ async function getWords(search, langs, counts, sts, top) {
   console.log(langs, counts, sts, top)
   const words = await Word.find()
                           .or([
-                            {$or: 
-                              [{word: {$regex:(search)}},
-                              {meaning: {$regex:(search)}},
-                              {example: {$regex:(search)}}]},
+                            // {$or: [{word: {$regex:search}}]},
+                            // {$or: [{meaning: {$regex:search}}]},
+                            // {$or: [{example: {$regex:search}}]},
                             {$or: langs},
                             {$or: counts},
                             {$or: sts},
