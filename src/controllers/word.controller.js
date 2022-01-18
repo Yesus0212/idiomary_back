@@ -155,17 +155,17 @@ async function getFilters(request, response) {
     // {$or: [{country: ""}, {country: "Colombia"},{topic: "Expresiones despectivas"}]}
 
 
-        const {languages, countries, states, topics} = request.body;       
+        // const {languages, countries, states, topics} = request.body;       
         
         const filters = {};
 
-        if(languages !== null){
-            filters.language = languages.forEach(lan => {
-               return language: lan
-            })
-        }
+        // if(languages !== null){
+        //     filters.language = languages.forEach(lan => {
+        //        return language: lan
+        //     })
+        // }
 
-        console.log(filters.language)
+        // console.log(filters.language)
 
         // filters.language = [language];
         // filters.country = [country];
