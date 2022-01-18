@@ -2,14 +2,14 @@ const { trusted, isValidObjectId } = require('mongoose');
 const Word = require('../models/word.model');
 
 // Función de consulta de todos los Words y filtrado
-async function getWords(langs, counts, sts, top) {
+async function getWords(search, langs, counts, sts, top) {
   console.log(langs, counts, sts, top)
   const words = await Word.find()
                           .or([
                             {$or: 
-                              [{word: $reg(search)},
-                              {meaning: $reg(search)},
-                              {example: $reg(search)}]},
+                              [{word: {$regex:(search)}},
+                              {meaning: {$regex:(search)}},
+                              {example: {$regex:(search)}}]},
                             {$or: langs},
                             {$or: counts},
                             {$or: sts},
