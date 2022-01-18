@@ -1,9 +1,19 @@
 const { trusted, isValidObjectId } = require('mongoose');
 const Word = require('../models/word.model');
 
+
+// Función de consulta de todos los Words y filtrado por palabra
+async function getWords(filters) {
+  const words = await Word.find()
+                          .or(filters)
+  
+  return words;
+}
+
+
+
 // Función de consulta de todos los Words y filtrado
-async function getWords(langs, counts, sts, top) {
-// async function getWords(filters) {
+async function getWordsByFilters(langs, counts, sts, top) {
   const words = await Word.find()
                           .or([
                             // {$or: [{word: {$regex:search}}]},
@@ -216,6 +226,7 @@ async function updateStatus (request) {
 
 module.exports = {
     getWords,
+    getWordsByFilters,
     getWordsById,
     setWord,
     deleteWord,

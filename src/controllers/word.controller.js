@@ -3,9 +3,15 @@ const Word = require('../usecases/word.usecase');
 async function getWord(request, response) {
     try {
         
-        
+        const {search} = request.query;               
+        const filters = {};
+    
+        if(search) {
+            filters.word = { $regex: word };
+            filters.meaning = { $regex: meaning };
+        }
 
-
+        const words = await Word.getWords(filters);
 
         response.statusCode = 200;
         response.json({
@@ -184,7 +190,7 @@ async function getFilters(request, response) {
             return {"topic": element};
         })
 
-        const words = await Word.getWords(langs, counts, sts, top);
+        const words = await Word.getWordsByFilters(langs, counts, sts, top);
 
         // console.log(filters);
 
