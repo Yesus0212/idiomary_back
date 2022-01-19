@@ -114,6 +114,10 @@ const wordSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    urlImage: {
+        type: String,
+        required: true,
+    },
     meaning: {
         type: String,
         required: true,
