@@ -114,7 +114,7 @@ const wordSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    urlImage: {
+    imgUser: {
         type: String,
         required: true,
     },
