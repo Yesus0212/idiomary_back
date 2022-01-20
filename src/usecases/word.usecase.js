@@ -11,6 +11,48 @@ async function getWords(filters) {
 }
 
 
+// Función de consulta de todos los Words y filtrado por palabra
+async function getAllTranslates(action) {
+
+  let select, where, or;
+
+  console.log(action)
+
+  if(action !== "" && action !== undefined){
+    switch (action) {
+      case "words":
+        select = ["_id", "word", "type", "userName", "imgUser", "meaning", "example", "urlImage", "language", "country", "state", "topic", "createdAt", "status"];
+        where = {"status": 1}
+        break;
+      case "complements":
+        select = ["_id", "word", "complements.userName", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "status"];
+        where = {"complements.status": 1}
+        break;
+      case "translations":
+        select = ["_id", "word", "meaning", "translations.userName", "translations.language", "translations.translate", "translations.status",
+        "complements._id","complements.translations.userName", "complements.translations.language", "complements.translations.translate", "complements.translations.status"];
+        where = {};
+        or =  [{"translations.status": 1},{"complements.translations.status": 1}]; 
+        break;
+      
+      default:
+          return "Invalid Action"
+    }
+  }
+  else{
+    select = [];
+    where = {};
+  }
+  
+
+  const words = await Word.find({})
+                          .select(select)
+                          .where(where)
+                          .or(or);
+  
+  return words;
+}
+
 
 // Función de consulta de todos los Words y filtrado
 async function getWordsByFilters(langs, counts, sts, top) {
@@ -231,5 +273,6 @@ module.exports = {
     setWord,
     deleteWord,
     setNewItem,
-    updateStatus
+    updateStatus,
+    getAllTranslates
 };
