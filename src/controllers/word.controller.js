@@ -1,3 +1,4 @@
+const { update } = require('../models/word.model');
 const Word = require('../usecases/word.usecase');
 
 async function getWord(request, response) {
@@ -207,7 +208,7 @@ async function getFilters(request, response) {
 
         response.statusCode = 200;
         response.json({
-            filters
+            words
         })
     }
     catch(error) {
@@ -222,6 +223,30 @@ async function getFilters(request, response) {
 };
 
 
+async function getTranslate(request, response) {
+    try {
+
+        const {action} = request.body;
+
+        const words = await Word.getAllTranslates(action);
+
+        console.log(words);
+
+        response.statusCode = 200;
+        response.json({
+            words
+        })        
+    } catch (error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            sucess: false,
+            message: 'Could not get Tranlations',
+            error
+        });
+    }
+}
+
 module.exports = {
     getWord,
     getWordById,
@@ -229,5 +254,6 @@ module.exports = {
     deleteWord,
     setNewItemWord,
     updateStatusWord,
-    getFilters
+    getFilters,
+    getTranslate
 };
