@@ -230,9 +230,35 @@ async function getTranslate(request, response) {
 
         const words = await Word.getAllTranslates(action);
 
+        let result;
+
+        if(action === "wordTranslations"){
+            result = words.map(({_id, word, meaning, translations}) => {
+                return {
+                    idWord: _id,
+                    word: word,
+                    meaning: meaning,
+                    translations
+                };
+            })
+        }
+        else if(action === "compTranslations"){
+            result = words.map(({_id, word, meaning, complements}) => {
+                return {
+                    idWord: _id,
+                    word: word,
+                    meaning: meaning,
+                    complements
+                };
+            })
+        }
+        else {
+            result = words;
+        }  
+        
         response.statusCode = 200;
         response.json({
-            words
+            result
         })        
     } catch (error) {
         console.error(error);
