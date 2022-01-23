@@ -14,36 +14,35 @@ async function getWords(filters) {
 // Función de consulta de todos los Words y filtrado por palabra
 async function getAllTranslates(action) {
 
-  let select, where, or;
+  let select, where, and, or;
 
   console.log(action)
 
   if(action !== "" && action !== undefined){
     switch (action) {
       case "words":
-        select = ["_id", "word", "type", "userName", "imgUser", "meaning", "example", "urlImage", "language", "country", "state", "topic", "createdAt", "status"];
+        select = ["_id", "word", "type", "userId", "userName", "imgUser", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"];
         where = {"status": 1}
+        and = [{}];
         or = [{}];
         break;
       case "complements":
-        select = ["_id", "word", "complements.userName", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "status"];
-        where = {"complements.status": 1}
+        select = ["_id", "word", "complements._id", "complements.userId", "complements.userName", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "status"];
+        where = {"status": 2}
+        and = [{"complements.status": 1}];
         or = [{}];
         break;
       case "wordTranslations":
-        select = ["_id", "word", "meaning", "translations", "complements._id", "complements.translations"];        
-        // "translations.userName", "translations.language", "translations.translate", "translations.status",
-        // "complements._id","complements.translations.userName", "complements.translations.language", "complements.translations.translate", "complements.translations.status"];
-        where = {};
-        or =  [{"translations.status": 1}]; 
+        select = ["_id", "word", "meaning", "translations"];        
+        where = {"status": 2};
+        and =  [{"translations.status": 1}]; 
+        or = [{}];
         break;
       case "compTranslations":
         select = ["_id", "word", "meaning", "complements._id", "complements.translations"];
-          
-        // "translations.userName", "translations.language", "translations.translate", "translations.status",
-        // "complements._id","complements.translations.userName", "complements.translations.language", "complements.translations.translate", "complements.translations.status"];
-        where = {};
-        or =  [{"complements.translations.status": 1}]; 
+        where = {"status": 2};
+        and = [{"complements.status": 2},{"complements.translations.status": 1}];
+        or =  [{}]; 
         break;      
       default:
           return "Invalid Action"
@@ -52,6 +51,7 @@ async function getAllTranslates(action) {
   else{
     select = [];
     where = {"status": 2};
+    and = [{}];
     or = [{}];
   }
   
@@ -59,6 +59,7 @@ async function getAllTranslates(action) {
   const words = await Word.find({})
                           .select(select)
                           .where(where)
+                          .and(and)
                           .or(or);
   
   return words;
