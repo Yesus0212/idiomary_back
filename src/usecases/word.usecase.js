@@ -23,25 +23,36 @@ async function getAllTranslates(action) {
       case "words":
         select = ["_id", "word", "type", "userName", "imgUser", "meaning", "example", "urlImage", "language", "country", "state", "topic", "createdAt", "status"];
         where = {"status": 1}
+        or = [{}];
         break;
       case "complements":
         select = ["_id", "word", "complements.userName", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "status"];
         where = {"complements.status": 1}
+        or = [{}];
         break;
-      case "translations":
-        select = ["_id", "word", "meaning", "translations.userName", "translations.language", "translations.translate", "translations.status",
-        "complements._id","complements.translations.userName", "complements.translations.language", "complements.translations.translate", "complements.translations.status"];
+      case "wordTranslations":
+        select = ["_id", "word", "meaning", "translations", "complements._id", "complements.translations"];        
+        // "translations.userName", "translations.language", "translations.translate", "translations.status",
+        // "complements._id","complements.translations.userName", "complements.translations.language", "complements.translations.translate", "complements.translations.status"];
         where = {};
-        or =  [{"translations.status": 1},{"complements.translations.status": 1}]; 
+        or =  [{"translations.status": 1}]; 
         break;
-      
+      case "compTranslations":
+        select = ["_id", "word", "meaning", "complements._id", "complements.translations"];
+          
+        // "translations.userName", "translations.language", "translations.translate", "translations.status",
+        // "complements._id","complements.translations.userName", "complements.translations.language", "complements.translations.translate", "complements.translations.status"];
+        where = {};
+        or =  [{"complements.translations.status": 1}]; 
+        break;      
       default:
           return "Invalid Action"
     }
   }
   else{
     select = [];
-    where = {};
+    where = {"status": 2};
+    or = [{}];
   }
   
 
