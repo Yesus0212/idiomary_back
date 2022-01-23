@@ -2,6 +2,10 @@ const mongoose = require ('mongoose')
 
 const translationSchema = new mongoose.Schema(
     {
+        userId: {
+            type: mongoose.Types.ObjectId,
+            required: true,
+        },
         userName: {
             type: String,
             required: false,
@@ -34,6 +38,10 @@ const translationSchema = new mongoose.Schema(
 
 const complementSchema = new mongoose.Schema(
     {
+        userId: {
+            type: mongoose.Types.ObjectId,
+            required: true,
+        },
         userName: {
             type: String,
             required: false,
@@ -110,6 +118,10 @@ const wordSchema = new mongoose.Schema({
         minlegth: 2,
         required: true,
     },
+    userId: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+    },
     userName: {
         type: String,
         required: true,
@@ -174,7 +186,6 @@ const wordSchema = new mongoose.Schema({
     },
     reason: {
         type: String,
-        minlength: 2,
         required: false,
     },    
     complements:[complementSchema],
