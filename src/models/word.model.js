@@ -4,7 +4,7 @@ const translationSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Types.ObjectId,
-            required: true,
+            required: false,
         },
         userName: {
             type: String,
@@ -40,7 +40,7 @@ const complementSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Types.ObjectId,
-            required: true,
+            required: false,
         },
         userName: {
             type: String,
@@ -120,7 +120,7 @@ const wordSchema = new mongoose.Schema({
     },
     userId: {
         type: mongoose.Types.ObjectId,
-        required: true,
+        required: false,
     },
     userName: {
         type: String,

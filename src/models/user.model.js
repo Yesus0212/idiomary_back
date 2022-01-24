@@ -71,7 +71,22 @@ const userSchema = new mongoose.Schema({
     points: {
         type: Number,
         min: 1, 
-        required: true,
+        required: false,
+    },
+    inValidation: {
+        type: Number,
+        min: 0,
+        required: false,
+    },
+    validated: {
+        type: Number,
+        min: 0,
+        required: false,
+    },
+    canceled: {
+        type: Number,
+        min: 0,
+        required: false,
     },
     filters: filterSchema,
 });

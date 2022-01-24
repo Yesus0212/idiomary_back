@@ -1,34 +1,34 @@
 const { update } = require('../models/word.model');
 const Word = require('../usecases/word.usecase');
 
-async function getWord(request, response) {
-    try {
+// async function getWord(request, response) {
+//     try {
         
-        const {search} = request.query;               
-        const filters = {};
+//         const {search} = request.query;               
+//         const filters = {};
     
-        if(search) {
-            filters.word = { $regex: word };
-            filters.meaning = { $regex: meaning };
-        }
+//         if(search) {
+//             filters.word = { $regex: word };
+//             filters.meaning = { $regex: meaning };
+//         }
 
-        const words = await Word.getWords(filters);
+//         const words = await Word.getWords(filters);
 
-        response.statusCode = 200;
-        response.json({
-            words
-        })
-    }
-    catch(error) {
-        console.error(error);
-        response.statusCode = 500;
-        response.json({
-            success: false,
-            message: 'Could not get Words',
-            error
-        });
-    }
-};
+//         response.statusCode = 200;
+//         response.json({
+//             words
+//         })
+//     }
+//     catch(error) {
+//         console.error(error);
+//         response.statusCode = 500;
+//         response.json({
+//             success: false,
+//             message: 'Could not get Words',
+//             error
+//         });
+//     }
+// };
 
 async function getWordById(request, response) {
     try {
@@ -223,12 +223,12 @@ async function getFilters(request, response) {
 };
 
 
-async function getTranslate(request, response) {
+async function getWord(request, response) {
     try {
 
         const {action} = request.body;
 
-        const words = await Word.getAllTranslates(action);
+        const words = await Word.getWords(action);
 
         let result;
 
@@ -278,6 +278,5 @@ module.exports = {
     deleteWord,
     setNewItemWord,
     updateStatusWord,
-    getFilters,
-    getTranslate
+    getFilters
 };

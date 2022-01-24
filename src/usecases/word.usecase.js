@@ -1,18 +1,17 @@
-const { trusted, isValidObjectId } = require('mongoose');
 const Word = require('../models/word.model');
 
 
-// Función de consulta de todos los Words y filtrado por palabra
-async function getWords(filters) {
-  const words = await Word.find()
-                          .or(filters)
+// // Función de consulta de todos los Words y filtrado por palabra
+// async function getWords(filters) {
+//   const words = await Word.find()
+//                           .or(filters)
   
-  return words;
-}
+//   return words;
+// }
 
 
 // Función de consulta de todos los Words y filtrado por palabra
-async function getAllTranslates(action) {
+async function getWords(action) {
 
   let select, where, and, or;
 
@@ -27,7 +26,7 @@ async function getAllTranslates(action) {
         or = [{}];
         break;
       case "complements":
-        select = ["_id", "word", "complements._id", "complements.userId", "complements.userName", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "status"];
+        select = ["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"];
         where = {"status": 2}
         and = [{"complements.status": 1}];
         or = [{}];
@@ -285,6 +284,5 @@ module.exports = {
     setWord,
     deleteWord,
     setNewItem,
-    updateStatus,
-    getAllTranslates
+    updateStatus
 };
