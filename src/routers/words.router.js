@@ -5,6 +5,7 @@ const router = express.Router()
 
 router.get('/', wordController.getWord);
 router.get('/:id', wordController.getWordById);
+router.get('/wordsByUser/:userId', wordController.getWord2);
 router.post('/', wordController.setWord);
 router.delete('/:id', wordController.deleteWord);
 router.patch('/newItem/:id', wordController.setNewItemWord);

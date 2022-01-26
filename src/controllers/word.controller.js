@@ -1,40 +1,64 @@
 const { update } = require('../models/word.model');
 const Word = require('../usecases/word.usecase');
 
-// async function getWord(request, response) {
-//     try {
+async function getWord2(request, response) {
+    try {
         
-//         const {search} = request.query;               
-//         const filters = {};
+        const userId = request.query;     
+        
+        console.log(userId, "id del usuario")
+
+        const filters = {};
     
-//         if(search) {
-//             filters.word = { $regex: word };
-//             filters.meaning = { $regex: meaning };
-//         }
+        if(userId) {
+            filters.userId =  userId;
+        }
 
-//         const words = await Word.getWords(filters);
+        const words = await Word.getWords2(filters);
 
-//         response.statusCode = 200;
-//         response.json({
-//             words
-//         })
-//     }
-//     catch(error) {
-//         console.error(error);
-//         response.statusCode = 500;
-//         response.json({
-//             success: false,
-//             message: 'Could not get Words',
-//             error
-//         });
-//     }
-// };
+        response.statusCode = 200;
+        response.json({
+            words
+        })
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not get Words',
+            error
+        });
+    }
+};
 
 async function getWordById(request, response) {
     try {
         const id = request.params.id;
         
         const words = await Word.getWordsById(id);
+
+        response.statusCode = 200;
+        response.json({
+            words
+        })
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not get Word',
+            error
+        });
+    }
+};
+
+async function getWordsByUser(request, response) {
+    try {
+        const userId = request.params.userId;
+        
+        const words = await Word.getWordsByUser(userId);
 
         response.statusCode = 200;
         response.json({
@@ -273,7 +297,9 @@ async function getWord(request, response) {
 
 module.exports = {
     getWord,
+    getWord2,
     getWordById,
+    getWordsByUser,
     setWord,
     deleteWord,
     setNewItemWord,

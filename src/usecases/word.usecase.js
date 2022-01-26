@@ -1,21 +1,21 @@
 const Word = require('../models/word.model');
 
 
-// // Función de consulta de todos los Words y filtrado por palabra
-// async function getWords(filters) {
-//   const words = await Word.find()
-//                           .or(filters)
+// Función de consulta de todos los Words y filtrado por palabra
+async function getWords2(filters) {
+
+  console.log(filters, "Filtros")
+
+  const words = await Word.find(filters);  
   
-//   return words;
-// }
+  return words;
+}
 
 
 // Función de consulta de todos los Words y filtrado por palabra
 async function getWords(action) {
 
   let select, where, and, or;
-
-  console.log(action)
 
   if(action !== "" && action !== undefined){
     switch (action) {
@@ -87,6 +87,18 @@ async function getWordsById(request) {
     const id = request;
     const word = await Word.findById(id);
     return word;
+}
+
+
+// Función de consulta por ID de Usuario
+async function getWordsByUser(request) {
+  const userId = request;
+
+  const filter = {"userId": "61d8ccaf7bb9b8eac22f860e"}
+
+  const word = await Word.find(filter);                          
+
+  return word;
 }
 
 
@@ -279,8 +291,10 @@ async function updateStatus (request) {
 
 module.exports = {
     getWords,
+    getWords2,
     getWordsByFilters,
     getWordsById,
+    getWordsByUser,
     setWord,
     deleteWord,
     setNewItem,
