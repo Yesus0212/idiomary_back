@@ -1,5 +1,5 @@
-const { update } = require('../models/word.model');
 const Word = require('../usecases/word.usecase');
+const User = require('../usecases/user.usecase');
 
 async function getWord2(request, response) {
     try {
@@ -80,7 +80,8 @@ async function getWordsByUser(request, response) {
 async function setWord(request, response) {
     try {
         const newWord = request.body;
-        const createWord = await Word.setWord(newWord);
+        const createWord = await Word.setWord(newWord)
+                                    .then(User.setStatusWords());
 
         response.statusCode = 200;
         response.json({
@@ -155,16 +156,25 @@ async function setNewItemWord(request, response) {
 async function updateStatusWord(request, response) {
     try {
         const id = request.params.id;
-        const {idComplement, idTranslate, nameValidator, status, reason} = request.body;
+        const {idUser, idComplement, idTranslate, nameValidator, status, reason} = request.body;
 
-        const updateComplement = await Word.updateStatus({id, idComplement, idTranslate, nameValidator, status, reason});
+        // Una vez que se actualiza el estatus de la palabra, se realiza la actualización de los números del usuario creador
+        const updateComplement = await Word.updateStatus2({id, idUser, idComplement, idTranslate, nameValidator, status, reason});
 
-        response.statusCode = 200;
-        response.json({
-            success: true,
-            updateComplement
-        })
-
+        if(!updateComplement){
+            response.statusCode = 412;
+            response.json({
+                success: true,
+                updateComplement
+            });            
+        }
+        else{
+            response.statusCode = 200;
+            response.json({
+                success: true,
+                updateComplement
+            });
+        }
     }
     catch(error) {
         console.error(error);
