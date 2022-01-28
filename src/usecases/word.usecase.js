@@ -16,33 +16,37 @@ async function getWords2(filters) {
 // Función de consulta de todos los Words y filtrado por palabra
 async function getWords(action) {
 
-  let select, where, and, or;
+  let select, where, and, or, sort;
 
   if(action !== "" && action !== undefined){
     switch (action) {
       case "words":
-        select = ["_id", "word", "type", "userId", "userName", "imgUser", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"];
+        select = ["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"];
         where = {"status": 1}
         and = [{}];
         or = [{}];
+        sort = {"createdAt": -1};
         break;
       case "complements":
-        select = ["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"];
+        select = ["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"];
         where = {"status": 2}
         and = [{"complements.status": 1}];
         or = [{}];
+        sort = {"complements.createdAt": -1};
         break;
       case "wordTranslations":
         select = ["_id", "word", "meaning", "translations"];        
         where = {"status": 2};
         and =  [{"translations.status": 1}]; 
         or = [{}];
+        sort = {};
         break;
       case "compTranslations":
         select = ["_id", "word", "meaning", "complements._id", "complements.translations"];
         where = {"status": 2};
         and = [{"complements.status": 2},{"complements.translations.status": 1}];
         or =  [{}]; 
+        sort = {};
         break;      
       default:
           return "Invalid Action"
@@ -53,6 +57,7 @@ async function getWords(action) {
     where = {"status": 2};
     and = [{}];
     or = [{}];
+    sort = {"createdAt": -1};
   }
   
 
@@ -60,7 +65,8 @@ async function getWords(action) {
                           .select(select)
                           .where(where)
                           .and(and)
-                          .or(or);
+                          .or(or)
+                          .sort(sort);
   
   return words;
 }
@@ -207,90 +213,90 @@ async function setNewItem (request) {
 
 
 // Función de actualización del estatus del documento
-async function updateStatus (request) {
+// async function updateStatus (request) {
 
-    const {id, idComplement, idTranslate, nameValidator, status, reason} = request;
+//     const {id, idComplement, idTranslate, nameValidator, status, reason} = request;
 
-    let updateWord;
+//     let updateWord;
    
-    if(idComplement !== ""){
-      if(idTranslate !== ""){
-        updateWord = await Word.findOneAndUpdate(
-          {
-            _id: id,
-          },
-          {
-            // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-            $set: {
-              "complements.$[com].translations.$[tra].userValidator" : nameValidator, 
-              "complements.$[com].translations.$[tra].reason" : reason,
-              "complements.$[com].translations.$[tra].status" : status
-            }
-          },
-          { 
-            arrayFilters: [
-              // Se requiere un filtro adicional para identificar el complemento a modificar
-              {"com._id": idComplement},
-              {"tra._id": idTranslate}
-            ],     
-            new: true,
-            useFindAndModify: true,
-            returnNewDocument: true,
-          }
-        );
-      }
-      else{
-        updateWord = await Word.findOneAndUpdate(
-          {
-            _id: id,
-          },
-          {
-            // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-            $set: {
-              "complements.$[com].userValidator" : nameValidator, 
-              "complements.$[com].reason" : reason,
-              "complements.$[com].status" : status,
-            }
-          },
-          { 
-            arrayFilters: [
-              // Se requiere un filtro adicional para identificar el complemento a modificar
-              {"com._id": idComplement}
-            ],     
-            new: true,
-            useFindAndModify: true,
-            returnNewDocument: true,
-          }
-        );
-      }
-    }
-    else{
-      updateWord = await Word.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-          $set: {
-            userValidator : nameValidator, 
-            reason : reason,
-            status : status,
-          }
-        },
-        {     
-          new: true,
-          useFindAndModify: true,
-          returnNewDocument: true,
-        }
-      );
-    }
+//     if(idComplement !== ""){
+//       if(idTranslate !== ""){
+//         updateWord = await Word.findOneAndUpdate(
+//           {
+//             _id: id,
+//           },
+//           {
+//             // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+//             $set: {
+//               "complements.$[com].translations.$[tra].userValidator" : nameValidator, 
+//               "complements.$[com].translations.$[tra].reason" : reason,
+//               "complements.$[com].translations.$[tra].status" : status
+//             }
+//           },
+//           { 
+//             arrayFilters: [
+//               // Se requiere un filtro adicional para identificar el complemento a modificar
+//               {"com._id": idComplement},
+//               {"tra._id": idTranslate}
+//             ],     
+//             new: true,
+//             useFindAndModify: true,
+//             returnNewDocument: true,
+//           }
+//         );
+//       }
+//       else{
+//         updateWord = await Word.findOneAndUpdate(
+//           {
+//             _id: id,
+//           },
+//           {
+//             // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+//             $set: {
+//               "complements.$[com].userValidator" : nameValidator, 
+//               "complements.$[com].reason" : reason,
+//               "complements.$[com].status" : status,
+//             }
+//           },
+//           { 
+//             arrayFilters: [
+//               // Se requiere un filtro adicional para identificar el complemento a modificar
+//               {"com._id": idComplement}
+//             ],     
+//             new: true,
+//             useFindAndModify: true,
+//             returnNewDocument: true,
+//           }
+//         );
+//       }
+//     }
+//     else{
+//       updateWord = await Word.findOneAndUpdate(
+//         {
+//           _id: id,
+//         },
+//         {
+//           // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+//           $set: {
+//             userValidator : nameValidator, 
+//             reason : reason,
+//             status : status,
+//           }
+//         },
+//         {     
+//           new: true,
+//           useFindAndModify: true,
+//           returnNewDocument: true,
+//         }
+//       );
+//     }
    
-  return updateComplement;
-};
+//   return updateComplement;
+// };
 
 
 // Función de actualización del estatus del documento
-async function updateStatus2(request) {
+async function updateStatus(request) {
 
   const {id, idUser, idComplement, idTranslate, nameValidator, status, reason} = request;
 
@@ -576,6 +582,5 @@ module.exports = {
     setWord,
     deleteWord,
     setNewItem,
-    updateStatus,
-    updateStatus2
+    updateStatus
 };
