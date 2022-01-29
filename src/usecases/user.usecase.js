@@ -81,10 +81,6 @@ async function updateNumber(idUser, statusWord) {
       updateNumber = "Invalid Action";
       break;
   }
-
-
-  console.log(updateNumber, "resultado de la actualización del usuario")
-
   return updateNumber;
 };
 

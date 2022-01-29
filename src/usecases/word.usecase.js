@@ -145,249 +145,125 @@ async function deleteWord(request) {
 async function setNewItem (request) {
 
   const {id, action, idComplement, newArray} = request;
+  const {userId, translations} = newArray;          
 
-  let updateComplement;
+  const session = await mongoose.startSession()
+  session.startTransaction()
 
-  switch (action) {
-    case "translate":
-      if(idComplement !== ""){
-        updateComplement = await Word.findOneAndUpdate(
+  try{
+    switch (action) {
+      case "translate":
+        if(idComplement !== ""){
+          await Word.findOneAndUpdate(
+            {
+              _id: id,
+            },
+            {
+              // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+              $push: {"complements.$[com].translations" : newArray},
+            },
+            { 
+              arrayFilters: [
+                // Se requiere un filtro adicional para identificar el complemento a modificar
+                {"com._id": idComplement},
+              ],     
+              new: true,
+              useFindAndModify: true,
+              returnNewDocument: true,
+            }
+          );         
+        }
+        else{
+          await Word.findOneAndUpdate(
+            {
+              _id: id,
+            },
+            {
+              $push: {translations: newArray} ,
+            },
+            {
+              new: true,
+              runValidators: true,
+              useFindAndModify: true,
+              returnNewDocument: true,
+            }
+          );          
+        }  
+        // Aquí actualiza el número de registros en validación del usuario 
+        await User.findOneAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            $inc: {
+              inValidation: 1
+            }
+          }
+        );
+        break;
+      case "complement":
+        await Word.findOneAndUpdate(
           {
             _id: id,
           },
           {
             // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-            $push: {"complements.$[com].translations" : newArray},
+            $push: {complements : newArray},
           },
-          { 
-            arrayFilters: [
-              // Se requiere un filtro adicional para identificar el complemento a modificar
-              {"com._id": idComplement},
-            ],     
+          {               
             new: true,
             useFindAndModify: true,
             returnNewDocument: true,
           }
-        );
-      }
-      else{
-        updateComplement = await Word.findOneAndUpdate(
-          {
-            _id: id,
-          },
-          {
-            $push: {translations: newArray} ,
-          },
-          {
-            new: true,
-            runValidators: true,
-            useFindAndModify: true,
-            returnNewDocument: true,
-          }
-        );
-      }
-      break;
-    case "complement":
-      updateComplement = await Word.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-          $push: {complements : newArray},
-        },
-        {               
-          new: true,
-          useFindAndModify: true,
-          returnNewDocument: true,
+        );   
+        
+        let validation = 1;
+        if(translations !== "" && translations !== undefined ){
+          console.log(validation, "antes actualizar");
+          validation = 2;
         }
-      );    
-      break;
-  
-    default:
-      return "Invalid action";
-  } 
-   
-  return updateComplement;
+
+        console.log(validation, "despues de actualizar");        
+        // Aquí actualiza el número de registros en validación del usuario 
+        await User.findOneAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            $inc: {
+              inValidation: validation
+            }
+          }
+        );         
+        break;    
+      default:
+        console.log("Invalid Action")
+        return "Invalid Action"
+    } 
+    
+    return true;
+  }
+  catch(error){
+    // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
+    await session.abortTransaction();
+    return false;
+  } finally {
+    // Finaliza la session
+    session.endSession();
+  }
 };
-
-
-// Función de actualización del estatus del documento
-// async function updateStatus (request) {
-
-//     const {id, idComplement, idTranslate, nameValidator, status, reason} = request;
-
-//     let updateWord;
-   
-//     if(idComplement !== ""){
-//       if(idTranslate !== ""){
-//         updateWord = await Word.findOneAndUpdate(
-//           {
-//             _id: id,
-//           },
-//           {
-//             // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-//             $set: {
-//               "complements.$[com].translations.$[tra].userValidator" : nameValidator, 
-//               "complements.$[com].translations.$[tra].reason" : reason,
-//               "complements.$[com].translations.$[tra].status" : status
-//             }
-//           },
-//           { 
-//             arrayFilters: [
-//               // Se requiere un filtro adicional para identificar el complemento a modificar
-//               {"com._id": idComplement},
-//               {"tra._id": idTranslate}
-//             ],     
-//             new: true,
-//             useFindAndModify: true,
-//             returnNewDocument: true,
-//           }
-//         );
-//       }
-//       else{
-//         updateWord = await Word.findOneAndUpdate(
-//           {
-//             _id: id,
-//           },
-//           {
-//             // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-//             $set: {
-//               "complements.$[com].userValidator" : nameValidator, 
-//               "complements.$[com].reason" : reason,
-//               "complements.$[com].status" : status,
-//             }
-//           },
-//           { 
-//             arrayFilters: [
-//               // Se requiere un filtro adicional para identificar el complemento a modificar
-//               {"com._id": idComplement}
-//             ],     
-//             new: true,
-//             useFindAndModify: true,
-//             returnNewDocument: true,
-//           }
-//         );
-//       }
-//     }
-//     else{
-//       updateWord = await Word.findOneAndUpdate(
-//         {
-//           _id: id,
-//         },
-//         {
-//           // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-//           $set: {
-//             userValidator : nameValidator, 
-//             reason : reason,
-//             status : status,
-//           }
-//         },
-//         {     
-//           new: true,
-//           useFindAndModify: true,
-//           returnNewDocument: true,
-//         }
-//       );
-//     }
-   
-//   return updateComplement;
-// };
 
 
 // Función de actualización del estatus del documento
 async function updateStatus(request) {
 
-  const {id, idUser, idComplement, idTranslate, nameValidator, status, reason} = request;
+  const {id, userId, idComplement, idTranslate, nameValidator, status, reason} = request;
 
   const session = await mongoose.startSession()
   session.startTransaction()
 
   try {
     switch (status) {
-      // case 1:
-      //   if(idComplement !== ""){
-      //     if(idTranslate !== ""){
-      //       await Word.findOneAndUpdate(
-      //         {
-      //           _id: id,
-      //         },
-      //         {
-      //           // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-      //           $set: {
-      //             "complements.$[com].translations.$[tra].userValidator" : nameValidator, 
-      //             "complements.$[com].translations.$[tra].reason" : reason,
-      //             "complements.$[com].translations.$[tra].status" : status
-      //           }
-      //         },
-      //         { 
-      //           arrayFilters: [
-      //             // Se requiere un filtro adicional para identificar el complemento a modificar
-      //             {"com._id": idComplement},
-      //             {"tra._id": idTranslate}
-      //           ],     
-      //           new: true,
-      //           useFindAndModify: true,
-      //           returnNewDocument: true,
-      //         }
-      //       );
-      //     }
-      //     else{
-      //       await Word.findOneAndUpdate(
-      //         {
-      //           _id: id,
-      //         },
-      //         {
-      //           // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-      //           $set: {
-      //             "complements.$[com].userValidator" : nameValidator, 
-      //             "complements.$[com].reason" : reason,
-      //             "complements.$[com].status" : status,
-      //           }
-      //         },
-      //         { 
-      //           arrayFilters: [
-      //             // Se requiere un filtro adicional para identificar el complemento a modificar
-      //             {"com._id": idComplement}
-      //           ],     
-      //           new: true,
-      //           useFindAndModify: true,
-      //           returnNewDocument: true,
-      //         }
-      //       );
-      //     }
-      //   }
-      //   else{
-      //     await Word.findOneAndUpdate(
-      //       {
-      //         _id: id,
-      //       },
-      //       {
-      //         // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-      //         $set: {
-      //           userValidator : nameValidator, 
-      //           reason : reason,
-      //           status : status,
-      //         }
-      //       },
-      //       {     
-      //         new: true,
-      //         useFindAndModify: true,
-      //         returnNewDocument: true,
-      //       }
-      //     );
-      //   }
-      //   await User.findOneAndUpdate(
-      //     {
-      //       _id: idUser,
-      //     },
-      //     {
-      //       $inc:{
-      //         inValidation: 1
-      //       }
-      //     }            
-      //   );
-      //   break;
       case 2:
         if(idComplement !== ""){
           if(idTranslate !== ""){
@@ -462,7 +338,7 @@ async function updateStatus(request) {
         }
         await User.findOneAndUpdate(
           {
-            _id: idUser,
+            _id: userId,
           },
           {
             $inc: {
@@ -546,7 +422,7 @@ async function updateStatus(request) {
         }
         await User.findOneAndUpdate(
           {
-            _id: idUser,
+            _id: userId,
           },
           {
             $inc: {

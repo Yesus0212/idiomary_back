@@ -131,21 +131,29 @@ async function setNewItemWord(request, response) {
         const { action, idComplement, newArray} = request.body;
 
         // Se utiliza para agregar un nuevo elemento a de traducción o complemento a la palabra
-        const updateComplement = await Word.setNewItem({id, action, idComplement, newArray});
+        const newItem = await Word.setNewItem({id, action, idComplement, newArray});
 
-        response.statusCode = 200;
-        response.json({
-            success: true,
-            updateComplement
-        })
-
+        if(!newItem){
+            response.statusCode = 412;
+            response.json({
+                success: false,
+                newItem
+            });            
+        }
+        else{
+            response.statusCode = 200;
+            response.json({
+                success: true,
+                newItem
+            });
+        }
     }
     catch(error) {
         console.error(error);
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not update a Word',
+            message: 'Could not insert a new Item a Word',
             error
         });
     }
@@ -156,23 +164,23 @@ async function setNewItemWord(request, response) {
 async function updateStatusWord(request, response) {
     try {
         const id = request.params.id;
-        const {idUser, idComplement, idTranslate, nameValidator, status, reason} = request.body;
+        const {userId, idComplement, idTranslate, nameValidator, status, reason} = request.body;
 
         // Una vez que se actualiza el estatus de la palabra, se realiza la actualización de los números del usuario creador
-        const updateComplement = await Word.updateStatus2({id, idUser, idComplement, idTranslate, nameValidator, status, reason});
+        const newStatus = await Word.updateStatus({id, userId, idComplement, idTranslate, nameValidator, status, reason});
 
-        if(!updateComplement){
+        if(!newStatus){
             response.statusCode = 412;
             response.json({
-                success: true,
-                updateComplement
+                success: false,
+                newStatus
             });            
         }
         else{
             response.statusCode = 200;
             response.json({
                 success: true,
-                updateComplement
+                newStatus
             });
         }
     }
