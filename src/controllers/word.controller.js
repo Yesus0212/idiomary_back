@@ -80,14 +80,23 @@ async function getWordsByUser(request, response) {
 async function setWord(request, response) {
     try {
         const newWord = request.body;
-        const createWord = await Word.setWord(newWord)
-                                    .then(User.setStatusWords());
+        const createWord = await Word.setWord(newWord);
 
-        response.statusCode = 200;
-        response.json({
-            success: true,
-            newWord
-        })
+
+        if(!createWord){
+            response.statusCode = 412;
+            response.json({
+                success: false,
+                createWord
+            });            
+        }
+        else{
+            response.statusCode = 200;
+            response.json({
+                success: true,
+                createWord
+            });
+        }
     }
     catch(error) {
         console.error(error);
@@ -268,7 +277,9 @@ async function getFilters(request, response) {
 async function getWord(request, response) {
     try {
 
-        const {action} = request.body;
+        const {action} = request.query;
+
+        console.log(action, "acción a realizar")
 
         const words = await Word.getWords(action);
 

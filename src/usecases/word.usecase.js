@@ -60,7 +60,6 @@ async function getWords(action) {
     sort = {"createdAt": -1};
   }
   
-
   const words = await Word.find({})
                           .select(select)
                           .where(where)
@@ -111,27 +110,66 @@ async function getWordsByUser(request) {
 
 // Función de inserción de word nuevo
 async function setWord(request) {
-    const {word, type, meaning, example, userName, urlImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = request;    
-    const setWord = await Word.create({
-        word,
-        type,
-        meaning,
-        userName,
-        example,
-        urlImage,
-        language,
-        country,
-        state,
-        topic,
-        translations, 
-        createdAt,
-        likes,
-        userValidator,
-        status,
-        reason,        
-        complements
+  const {word, type, userId, imgUser, userName, meaning, example, urlImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = request;    
+  
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try{
+    await Word.create({
+      word,
+      type,
+      userId,
+      userName,
+      imgUser,
+      meaning,      
+      example,
+      urlImage,
+      language,
+      country,
+      state,
+      topic,
+      translations, 
+      createdAt,
+      likes,
+      userValidator,
+      status,
+      reason,        
+      complements
     });
-    return setWord;
+
+    console.log(translations, "collection translations");
+
+
+    let validation = 1;
+    if(translations !== "" && translations !== undefined ){
+      validation = 2;
+    }
+
+    console.log(validation, "número a sumar");
+ 
+    // Aquí actualiza el número de registros en validación del usuario 
+    await User.findOneAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        $inc: {
+          inValidation: validation
+        }
+      }
+    );
+
+    return true;
+  }
+  catch(error){
+    // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
+    await session.abortTransaction();
+    return false;
+  } finally {
+    // Finaliza la session
+    session.endSession();
+  }
 }
 
 // Función de eliminación de word por ID
