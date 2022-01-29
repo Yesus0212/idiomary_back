@@ -33,6 +33,58 @@ async function setUser(request) {
     return setUser;
 }
 
+// Actualiza el numero de palabras de un usuario
+async function updateNumber(idUser, statusWord) {
+
+  let updateNumber;
+ 
+  switch (statusWord) {
+    case 1:
+      updateNumber = await User.findOneAndUpdate(
+        {
+          _id: idUser,
+        },
+        {
+          $inc:{
+            inValidation: 1
+          }
+        }            
+      );
+      break;
+    case 2:
+      updateNumber = await User.findOneAndUpdate(
+        {
+          _id: idUser,
+        },
+        {
+          $inc: {
+            inValidation: -1,
+            validated: 1
+          }
+        }
+      );            
+      break;
+    case 3:
+      updateNumber = await User.findOneAndUpdate(
+        {
+          _id: idUser,
+        },
+        {
+          $inc: {
+            inValidation: -1,
+            canceled: 1
+          }
+        }
+      );         
+      break;
+    default:
+      updateNumber = "Invalid Action";
+      break;
+  }
+  return updateNumber;
+};
+
+
 // Función de eliminación de user por ID
 async function deleteUser(request) {
     const id = request;         
@@ -40,9 +92,10 @@ async function deleteUser(request) {
     return deleteUser;
 }
 
-module.exports = {
+module.exports = {    
     getUsers,
     getUsersById,
     setUser,
+    updateNumber,
     deleteUser,
 };

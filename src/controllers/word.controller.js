@@ -1,34 +1,36 @@
-const { update } = require('../models/word.model');
 const Word = require('../usecases/word.usecase');
+const User = require('../usecases/user.usecase');
 
-// async function getWord(request, response) {
-//     try {
+async function getWord2(request, response) {
+    try {
         
-//         const {search} = request.query;               
-//         const filters = {};
+        const userId = request.query;     
+        
+        console.log(userId, "id del usuario")
+
+        const filters = {};
     
-//         if(search) {
-//             filters.word = { $regex: word };
-//             filters.meaning = { $regex: meaning };
-//         }
+        if(userId) {
+            filters.userId =  userId;
+        }
 
-//         const words = await Word.getWords(filters);
+        const words = await Word.getWords2(filters);
 
-//         response.statusCode = 200;
-//         response.json({
-//             words
-//         })
-//     }
-//     catch(error) {
-//         console.error(error);
-//         response.statusCode = 500;
-//         response.json({
-//             success: false,
-//             message: 'Could not get Words',
-//             error
-//         });
-//     }
-// };
+        response.statusCode = 200;
+        response.json({
+            words
+        })
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not get Words',
+            error
+        });
+    }
+};
 
 async function getWordById(request, response) {
     try {
@@ -52,11 +54,34 @@ async function getWordById(request, response) {
     }
 };
 
+async function getWordsByUser(request, response) {
+    try {
+        const userId = request.params.userId;
+        
+        const words = await Word.getWordsByUser(userId);
+
+        response.statusCode = 200;
+        response.json({
+            words
+        })
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not get Word',
+            error
+        });
+    }
+};
+
 
 async function setWord(request, response) {
     try {
         const newWord = request.body;
-        const createWord = await Word.setWord(newWord);
+        const createWord = await Word.setWord(newWord)
+                                    .then(User.setStatusWords());
 
         response.statusCode = 200;
         response.json({
@@ -106,21 +131,29 @@ async function setNewItemWord(request, response) {
         const { action, idComplement, newArray} = request.body;
 
         // Se utiliza para agregar un nuevo elemento a de traducción o complemento a la palabra
-        const updateComplement = await Word.setNewItem({id, action, idComplement, newArray});
+        const newItem = await Word.setNewItem({id, action, idComplement, newArray});
 
-        response.statusCode = 200;
-        response.json({
-            success: true,
-            updateComplement
-        })
-
+        if(!newItem){
+            response.statusCode = 412;
+            response.json({
+                success: false,
+                newItem
+            });            
+        }
+        else{
+            response.statusCode = 200;
+            response.json({
+                success: true,
+                newItem
+            });
+        }
     }
     catch(error) {
         console.error(error);
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not update a Word',
+            message: 'Could not insert a new Item a Word',
             error
         });
     }
@@ -131,16 +164,25 @@ async function setNewItemWord(request, response) {
 async function updateStatusWord(request, response) {
     try {
         const id = request.params.id;
-        const {idComplement, idTranslate, nameValidator, status, reason} = request.body;
+        const {userId, idComplement, idTranslate, nameValidator, status, reason} = request.body;
 
-        const updateComplement = await Word.updateStatus({id, idComplement, idTranslate, nameValidator, status, reason});
+        // Una vez que se actualiza el estatus de la palabra, se realiza la actualización de los números del usuario creador
+        const newStatus = await Word.updateStatus({id, userId, idComplement, idTranslate, nameValidator, status, reason});
 
-        response.statusCode = 200;
-        response.json({
-            success: true,
-            updateComplement
-        })
-
+        if(!newStatus){
+            response.statusCode = 412;
+            response.json({
+                success: false,
+                newStatus
+            });            
+        }
+        else{
+            response.statusCode = 200;
+            response.json({
+                success: true,
+                newStatus
+            });
+        }
     }
     catch(error) {
         console.error(error);
@@ -273,7 +315,9 @@ async function getWord(request, response) {
 
 module.exports = {
     getWord,
+    getWord2,
     getWordById,
+    getWordsByUser,
     setWord,
     deleteWord,
     setNewItemWord,
