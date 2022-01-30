@@ -138,15 +138,10 @@ async function setWord(request) {
       complements
     });
 
-    console.log(translations, "collection translations");
-
-
     let validation = 1;
     if(translations !== "" && translations !== undefined ){
       validation = 2;
     }
-
-    console.log(validation, "número a sumar");
  
     // Aquí actualiza el número de registros en validación del usuario 
     await User.findOneAndUpdate(
@@ -374,6 +369,7 @@ async function updateStatus(request) {
             }
           );
         }
+        // Se incrementa en 1 el campo de registros validados y de los puntos de usuario y a la vez se decrementa en 1 el campo de registros en validación
         await User.findOneAndUpdate(
           {
             _id: userId,
@@ -381,7 +377,8 @@ async function updateStatus(request) {
           {
             $inc: {
               inValidation: -1,
-              validated: 1
+              validated: 1,
+              points: 1
             }
           }
         );            
@@ -458,6 +455,7 @@ async function updateStatus(request) {
             }
           );
         }
+        // Se decrementa en 1 el campo de registros en validación y se incrementa en 1 el de canceladoss
         await User.findOneAndUpdate(
           {
             _id: userId,
