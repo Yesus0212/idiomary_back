@@ -65,7 +65,7 @@ async function setUser(request, response) {
         if(error.code === 11000){
             response.statusCode = 412;
             result = {
-                "error": "1100",
+                "error": "11000",
                 "value": "Correo o usuario duplicados"
             }
         }
