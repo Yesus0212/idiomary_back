@@ -1,5 +1,53 @@
 const Word = require('../usecases/word.usecase');
-const User = require('../usecases/user.usecase');
+
+
+// Obtiene la información 
+async function getWord(request, response) {
+    try {
+
+        const {action} = request.query;
+        const words = await Word.getWords(action);
+
+        let result;
+
+        if(action === "wordTranslations"){
+            result = words.map(({_id, word, meaning, translations}) => {
+                return {
+                    idWord: _id,
+                    word: word,
+                    meaning: meaning,
+                    translations
+                };
+            })
+        }
+        else if(action === "compTranslations"){
+            result = words.map(({_id, word, meaning, complements}) => {
+                return {
+                    idWord: _id,
+                    word: word,
+                    meaning: meaning,
+                    complements
+                };
+            })
+        }
+        else {
+            result = words;
+        }  
+        
+        response.statusCode = 200;
+        response.json({
+            result
+        })        
+    } catch (error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            sucess: false,
+            message: 'Could not get Tranlations',
+            error
+        });
+    }
+}
 
 async function getWord2(request, response) {
     try {
@@ -198,7 +246,7 @@ async function updateStatusWord(request, response) {
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not update a Word',
+            message: 'Could not update word status',
             error
         });
     }
@@ -274,55 +322,7 @@ async function getFilters(request, response) {
 };
 
 
-async function getWord(request, response) {
-    try {
 
-        const {action} = request.query;
-
-        console.log(action, "acción a realizar")
-
-        const words = await Word.getWords(action);
-
-        let result;
-
-        if(action === "wordTranslations"){
-            result = words.map(({_id, word, meaning, translations}) => {
-                return {
-                    idWord: _id,
-                    word: word,
-                    meaning: meaning,
-                    translations
-                };
-            })
-        }
-        else if(action === "compTranslations"){
-            result = words.map(({_id, word, meaning, complements}) => {
-                return {
-                    idWord: _id,
-                    word: word,
-                    meaning: meaning,
-                    complements
-                };
-            })
-        }
-        else {
-            result = words;
-        }  
-        
-        response.statusCode = 200;
-        response.json({
-            result
-        })        
-    } catch (error) {
-        console.error(error);
-        response.statusCode = 500;
-        response.json({
-            sucess: false,
-            message: 'Could not get Tranlations',
-            error
-        });
-    }
-}
 
 module.exports = {
     getWord,
