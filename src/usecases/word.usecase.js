@@ -1,6 +1,6 @@
 const Word = require('../models/word.model');
 const User = require('../models/user.model');
-const mongoose = require ('mongoose')
+const mongoose = require ('mongoose');
 
 // Función de consulta de todos los Words y filtrado por palabra
 async function getWords2(filters) {
@@ -72,17 +72,23 @@ async function getWords(action) {
 
 
 // Función de consulta de todos los Words y filtrado
-async function getWordsByFilters(langs, counts, sts, top) {
-  const words = await Word.find()
-                          .or([
-                            // {$or: [{word: {$regex:search}}]},
-                            // {$or: [{meaning: {$regex:search}}]},
-                            // {$or: [{example: {$regex:search}}]},
-                            {$or: langs},
-                            {$or: counts},
-                            {$or: sts},
-                            {$or: top}
-                          ]);
+// async function getWordsByFilters(langs, counts, sts, top) {
+//   const words = await Word.find()
+//                           .or([
+//                             // {$or: [{word: {$regex:search}}]},
+//                             // {$or: [{meaning: {$regex:search}}]},
+//                             // {$or: [{example: {$regex:search}}]},
+//                             {$or: langs},
+//                             {$or: counts},
+//                             {$or: sts},
+//                             {$or: top}
+//                           ]);
+
+//   return words;
+// }
+async function getWordsByFilters(filters) {
+
+  const words = await Word.find(filters);
 
   return words;
 }
@@ -93,18 +99,6 @@ async function getWordsById(request) {
     const id = request;
     const word = await Word.findById(id);
     return word;
-}
-
-
-// Función de consulta por ID de Usuario
-async function getWordsByUser(request) {
-  const userId = request;
-
-  const filter = {"userId": "61d8ccaf7bb9b8eac22f860e"}
-
-  const word = await Word.find(filter);                          
-
-  return word;
 }
 
 
@@ -490,7 +484,6 @@ module.exports = {
     getWords2,
     getWordsByFilters,
     getWordsById,
-    getWordsByUser,
     setWord,
     deleteWord,
     setNewItem,

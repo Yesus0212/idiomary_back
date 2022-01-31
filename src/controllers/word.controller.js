@@ -102,27 +102,6 @@ async function getWordById(request, response) {
     }
 };
 
-async function getWordsByUser(request, response) {
-    try {
-        const userId = request.params.userId;
-        
-        const words = await Word.getWordsByUser(userId);
-
-        response.statusCode = 200;
-        response.json({
-            words
-        })
-    }
-    catch(error) {
-        console.error(error);
-        response.statusCode = 500;
-        response.json({
-            success: false,
-            message: 'Could not get Word',
-            error
-        });
-    }
-};
 
 
 async function setWord(request, response) {
@@ -252,45 +231,39 @@ async function updateStatusWord(request, response) {
     }
 }
 
-async function getFilters(request, response) {
+async function getWordsByFilter(request, response) {
     try {
 
-        const {languages, countries, states, topics} = request.body; 
+        const {language, country, state, topic, userName, search} = request.query; 
 
-        // const filters = {};
+        const filters = {}
 
-        // if(search){
-        //     filters.meaning = { $regex: search };
-        //     filters.word = { $regex: search };
-        // } 
-        // if(language.length) filters.language = language;
-        // if(country.length) filters.country = country;
-        // if(state.length) filters.state = state;
-        // if(topic.length) filters.topic = topic;
+        if(language) filters.language = language;
+        if(country) filters.country = country;
+        if(state) filters.state = state;
+        if(topic) filters.topic = topic;
+        if(userName) filters.userName = userName;
+        if(search){
+            filters.word = search;
+        }
 
+        // langs = languages.map(element => {
+        //      return {"language": element};      
+        // });
 
-        let langs;
-        let counts;
-        let sts;
-        let top;
+        // counts = countries.map(element => {
+        //     return {"country": element};      
+        // });  
 
-        langs = languages.map(element => {
-             return {"language": element};      
-        });
+        // sts = states.map(element => {
+        //     return {"state": element};
+        // })
 
-        counts = countries.map(element => {
-            return {"country": element};      
-        });  
+        // top = topics.map(element => {
+        //     return {"topic": element};
+        // })
 
-        sts = states.map(element => {
-            return {"state": element};
-        })
-
-        top = topics.map(element => {
-            return {"topic": element};
-        })
-
-        const words = await Word.getWordsByFilters(langs, counts, sts, top);
+        const words = await Word.getWordsByFilters(filters);
 
         // console.log(filters);
 
@@ -322,16 +295,13 @@ async function getFilters(request, response) {
 };
 
 
-
-
 module.exports = {
     getWord,
     getWord2,
     getWordById,
-    getWordsByUser,
+    getWordsByFilter,
     setWord,
     deleteWord,
     setNewItemWord,
-    updateStatusWord,
-    getFilters
+    updateStatusWord
 };
