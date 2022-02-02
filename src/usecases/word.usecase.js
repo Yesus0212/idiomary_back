@@ -8,8 +8,6 @@ async function getWords(action, userName) {
 
   console.log(action, userName)
 
-  let select, where, and, or, sort;
-
   if(action !== "" && action !== undefined && action === "pendings" && (userName !== "" || userName === undefined)){
 
     const words = await Word.find({})
@@ -473,7 +471,7 @@ module.exports = {
     getWordsByFilters,
     getWordsById,
     setWord,
-    deleteWord,
     setNewItem,
-    updateStatus
+    updateStatus,
+    deleteWord
 };
