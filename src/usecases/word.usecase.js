@@ -10,39 +10,35 @@ async function getWords(action, userName) {
 
   let select, where, and, or, sort;
 
-  if(action !== "" && action !== undefined && (userName !== "" || userName === undefined)){
-    switch (action) {
-      case "words":
-        select = ["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"];
-        where = {"status": 1}
-        and = [{}];
-        or = [{}];
-        sort = {"createdAt": -1};
-        break;
-      case "complements":
-        select = ["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"];
-        where = {"status": 2}
-        and = [{"complements.status": 1}];
-        or = [{}];
-        sort = {"complements.createdAt": -1};
-        break;
-      case "wordTranslations":
-        select = ["_id", "word", "meaning", "translations"];        
-        where = {"status": 2};
-        and =  [{"translations.status": 1}]; 
-        or = [{}];
-        sort = {};
-        break;
-      case "compTranslations":
-        select = ["_id", "word", "meaning", "complements._id", "complements.translations"];
-        where = {"status": 2};
-        and = [{"complements.status": 2},{"complements.translations.status": 1}];
-        or =  [{}]; 
-        sort = {};
-        break;      
-      default:
-          return "Invalid Action"
-    }
+  if(action !== "" && action !== undefined && action === "pendings" && (userName !== "" || userName === undefined)){
+
+    const words = await Word.find({})
+                            .where({"status": 1})
+                            .select(["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"])
+                            .sort({"createdAt": -1});
+
+    const complements = await Word.find({})
+                                  .select(["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"])
+                                  .where({"status": 2})
+                                  .and([{"complements.status": 1}])
+                                  .sort({"complements.createdAt": -1});
+
+    const wordTranslations = await Word.find({})
+                                        .select(["_id", "word", "meaning", "translations"])
+                                        .where({"status": 2})
+                                        .and([{"translations.status": 1}]); 
+
+    const compTranslations = await Word.find({})
+                                        .select(["_id", "word", "meaning", "complements._id", "complements.translations"])
+                                        .where({"status": 2})
+                                        .and([{"complements.status": 2},{"complements.translations.status": 1}]);
+
+    return pendings = {
+                        words, 
+                        complements, 
+                        wordTranslations, 
+                        compTranslations
+                      };
   }
   else if(userName !== "" && userName !== undefined && (action === "" || action === undefined)){
 
@@ -52,7 +48,7 @@ async function getWords(action, userName) {
 
     const complements = await Word.find({"complements.userName": userName})
                                 .select(["complements._id", "word", "complements.likes", "complements.status", "complements.reason"])
-                                .sort({"createdAt": -1});
+                                .sort({"complements.createdAt": -1});
   
     const wordTranslations = await Word.find({"translations.userName": userName})
                                       .select(["translations._id", "translations.translate", "translations.status", "translations.reason"])
@@ -60,7 +56,7 @@ async function getWords(action, userName) {
 
     const compTranslations = await Word.find({"complements.translations.userName": userName})
                                       .select(["complements.translations._id", "complements.translations.translate", "complements.translations.status", "complements.translations.reason"])
-                                      .sort({"createdAt": -1});
+                                      .sort({"complements.createdAt": -1});
 
     return wordsUser = {
                           words, 

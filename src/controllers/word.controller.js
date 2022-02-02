@@ -10,35 +10,35 @@ async function getWord(request, response) {
         console.log(action, userName);
         const words = await Word.getWords(action, userName);
 
-        let result;
+        // let result;
 
-        if(action === "wordTranslations"){
-            result = words.map(({_id, word, meaning, translations}) => {
-                return {
-                    idWord: _id,
-                    word: word,
-                    meaning: meaning,
-                    translations
-                };
-            })
-        }
-        else if(action === "compTranslations"){
-            result = words.map(({_id, word, meaning, complements}) => {
-                return {
-                    idWord: _id,
-                    word: word,
-                    meaning: meaning,
-                    complements
-                };
-            })
-        }
-        else {
-            result = words;
-        }  
+        // if(action === "wordTranslations"){
+        //     result = words.map(({_id, word, meaning, translations}) => {
+        //         return {
+        //             idWord: _id,
+        //             word: word,
+        //             meaning: meaning,
+        //             translations
+        //         };
+        //     })
+        // }
+        // else if(action === "compTranslations"){
+        //     result = words.map(({_id, word, meaning, complements}) => {
+        //         return {
+        //             idWord: _id,
+        //             word: word,
+        //             meaning: meaning,
+        //             complements
+        //         };
+        //     })
+        // }
+        // else {
+        //     result = words;
+        // }  
         
         response.statusCode = 200;
         response.json({
-            result
+            words
         })        
     } catch (error) {
         console.error(error);
