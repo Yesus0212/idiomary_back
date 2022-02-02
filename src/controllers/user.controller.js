@@ -129,6 +129,25 @@ async function deleteUser(request, response) {
     }
 };
 
+// Función para validar el usuario
+async function getAuthenticate(request, response) {
+    try {
+        const authenticate = await User.getAuthenticate();
+
+        response.statusCode = 200;
+        response.json({
+            success: true,
+            authenticate
+        })
+    }
+    catch(error) {
+        response.statusCode = 400;
+        response.json({
+            success: false,
+            message: 'Could not authenticated'
+        })
+    }
+}
 
 module.exports = {
     getUser,
@@ -136,4 +155,5 @@ module.exports = {
     setUser,
     updateNumberWords,
     deleteUser,
+    getAuthenticate
 };

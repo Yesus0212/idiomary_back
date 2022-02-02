@@ -1,4 +1,7 @@
+const res = require('express/lib/response');
 const User = require('../models/user.model');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Función de consulta de todos los Users y filtrado
 async function getUsers(filters) {
@@ -92,10 +95,31 @@ async function deleteUser(request) {
     return deleteUser;
 }
 
+
+// Función para validar
+async function getAuthenticate(userName, password) {
+  
+  const key = process.env.KEY;
+
+  jwt.sign(userName, key, (err, token) => {
+    if(err){
+      return err;
+    }
+    else {
+      return {
+        msg: 'success',
+        token: token
+      }
+    }
+  })
+}
+
+
 module.exports = {    
     getUsers,
     getUsersById,
     setUser,
     updateNumber,
     deleteUser,
+    getAuthenticate
 };
