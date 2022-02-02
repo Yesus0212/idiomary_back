@@ -5,8 +5,10 @@ const Word = require('../usecases/word.usecase');
 async function getWord(request, response) {
     try {
 
-        const {action} = request.query;
-        const words = await Word.getWords(action);
+        const {action, userName} = request.query;
+
+        console.log(action, userName);
+        const words = await Word.getWords(action, userName);
 
         let result;
 
@@ -49,36 +51,34 @@ async function getWord(request, response) {
     }
 }
 
-async function getWord2(request, response) {
-    try {
+// async function getWordsByUser(request, response) {
+//     try {
         
-        const userId = request.query;     
-        
-        console.log(userId, "id del usuario")
+//         const {userName} = request.query;
 
-        const filters = {};
-    
-        if(userId) {
-            filters.userId =  userId;
-        }
+//         const filters = {};
 
-        const words = await Word.getWords2(filters);
+//         filters.userName = userName;
 
-        response.statusCode = 200;
-        response.json({
-            words
-        })
-    }
-    catch(error) {
-        console.error(error);
-        response.statusCode = 500;
-        response.json({
-            success: false,
-            message: 'Could not get Words',
-            error
-        });
-    }
-};
+//         console.log(filters, "Este es el filtro en el control")
+
+//         const wordsUser = await Word.getWordsByUser(filters);
+
+//         response.statusCode = 200;
+//         response.json({
+//             wordsUser
+//         })
+//     }
+//     catch(error) {
+//         console.error(error);
+//         response.statusCode = 500;
+//         response.json({
+//             success: false,
+//             message: 'Could not get Words',
+//             error
+//         });
+//     }
+// };
 
 async function getWordById(request, response) {
     try {
@@ -234,49 +234,28 @@ async function updateStatusWord(request, response) {
 async function getWordsByFilter(request, response) {
     try {
 
-        const {language, country, state, topic, userName, search} = request.query; 
+        const {search} = request.query; 
 
         const filters = {}
 
-        if(language) filters.language = language;
-        if(country) filters.country = country;
-        if(state) filters.state = state;
-        if(topic) filters.topic = topic;
-        if(userName) filters.userName = userName;
         if(search){
-            filters.word = search;
+
+            const REG_EXP_SEARCH = {$regex: search, $options: "i"};
+
+            filters.$or = [
+                {word: REG_EXP_SEARCH},
+                {meaning: REG_EXP_SEARCH},
+                {example: REG_EXP_SEARCH},
+                {topic: REG_EXP_SEARCH},
+                {"translations.translate": REG_EXP_SEARCH},
+                {"complements.meaning": REG_EXP_SEARCH},
+                {"complements.example": REG_EXP_SEARCH},
+                {"complements.topic": REG_EXP_SEARCH},
+                {"complements.translations.translate": REG_EXP_SEARCH}
+            ]
         }
 
-        // langs = languages.map(element => {
-        //      return {"language": element};      
-        // });
-
-        // counts = countries.map(element => {
-        //     return {"country": element};      
-        // });  
-
-        // sts = states.map(element => {
-        //     return {"state": element};
-        // })
-
-        // top = topics.map(element => {
-        //     return {"topic": element};
-        // })
-
         const words = await Word.getWordsByFilters(filters);
-
-        // console.log(filters);
-
-        // const words = await Word.getWords(filters);
-
-
-        // Ejemplo de envío
-        // {
-        //     "languages":[""],
-        //     "countries":["Colombia"],
-        //     "states":[""],
-        //     "topics":["Expresiones despectivas"]
-        // }
 
         response.statusCode = 200;
         response.json({
@@ -297,7 +276,7 @@ async function getWordsByFilter(request, response) {
 
 module.exports = {
     getWord,
-    getWord2,
+    // getWordsByUser,
     getWordById,
     getWordsByFilter,
     setWord,
