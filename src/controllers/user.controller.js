@@ -130,10 +130,38 @@ async function deleteUser(request, response) {
 };
 
 
+// Función para actualizar el estatus de una palabra
+async function updateUser(request, response) {
+    try {
+        const id = request.params.id;
+        const { language, country, state, urlImage, filters } = request.body;
+
+        // Se utiliza para actualizar la información de un usuario
+        const update = await User.setNewData({id, language, country, state, urlImage, filters});
+
+        response.statusCode = 200;
+        response.json({
+            success: true,
+            update
+        });
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not insert a new Item a Word',
+            error
+        });
+    }
+}
+
+
 module.exports = {
     getUser,
     getUserById,
     setUser,
     updateNumberWords,
     deleteUser,
+    updateUser,
 };
