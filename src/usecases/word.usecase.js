@@ -1,24 +1,16 @@
 const Word = require('../models/word.model');
 const User = require('../models/user.model');
-const mongoose = require ('mongoose')
-
-// Función de consulta de todos los Words y filtrado por palabra
-async function getWords2(filters) {
-
-  console.log(filters, "Filtros")
-
-  const words = await Word.find(filters);  
-  
-  return words;
-}
+const mongoose = require ('mongoose');
 
 
 // Función de consulta de todos los Words y filtrado por palabra
-async function getWords(action) {
+async function getWords(action, userName) {
+
+  console.log(action, userName)
 
   let select, where, and, or, sort;
 
-  if(action !== "" && action !== undefined){
+  if(action !== "" && action !== undefined && (userName !== "" || userName === undefined)){
     switch (action) {
       case "words":
         select = ["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"];
@@ -52,6 +44,31 @@ async function getWords(action) {
           return "Invalid Action"
     }
   }
+  else if(userName !== "" && userName !== undefined && (action === "" || action === undefined)){
+
+    const words = await Word.find({userName: userName})
+                          .select(["_id", "word", "likes", "status", "reason"])
+                          .sort({"createdAt": -1});
+
+    const complements = await Word.find({"complements.userName": userName})
+                                .select(["complements._id", "word", "complements.likes", "complements.status", "complements.reason"])
+                                .sort({"createdAt": -1});
+  
+    const wordTranslations = await Word.find({"translations.userName": userName})
+                                      .select(["translations._id", "translations.translate", "translations.status", "translations.reason"])
+                                      .sort({"createdAt": -1});
+
+    const compTranslations = await Word.find({"complements.translations.userName": userName})
+                                      .select(["complements.translations._id", "complements.translations.translate", "complements.translations.status", "complements.translations.reason"])
+                                      .sort({"createdAt": -1});
+
+    return wordsUser = {
+                          words, 
+                          complements, 
+                          wordTranslations, 
+                          compTranslations
+                        };
+  }
   else{
     select = [];
     where = {"status": 2};
@@ -71,18 +88,9 @@ async function getWords(action) {
 }
 
 
-// Función de consulta de todos los Words y filtrado
-async function getWordsByFilters(langs, counts, sts, top) {
-  const words = await Word.find()
-                          .or([
-                            // {$or: [{word: {$regex:search}}]},
-                            // {$or: [{meaning: {$regex:search}}]},
-                            // {$or: [{example: {$regex:search}}]},
-                            {$or: langs},
-                            {$or: counts},
-                            {$or: sts},
-                            {$or: top}
-                          ]);
+async function getWordsByFilters(filters) {
+
+  const words = await Word.find(filters);
 
   return words;
 }
@@ -93,18 +101,6 @@ async function getWordsById(request) {
     const id = request;
     const word = await Word.findById(id);
     return word;
-}
-
-
-// Función de consulta por ID de Usuario
-async function getWordsByUser(request) {
-  const userId = request;
-
-  const filter = {"userId": "61d8ccaf7bb9b8eac22f860e"}
-
-  const word = await Word.find(filter);                          
-
-  return word;
 }
 
 
@@ -487,10 +483,9 @@ async function updateStatus(request) {
 
 module.exports = {
     getWords,
-    getWords2,
     getWordsByFilters,
+    // getWordsByUser,
     getWordsById,
-    getWordsByUser,
     setWord,
     deleteWord,
     setNewItem,

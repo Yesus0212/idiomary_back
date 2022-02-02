@@ -5,8 +5,10 @@ const Word = require('../usecases/word.usecase');
 async function getWord(request, response) {
     try {
 
-        const {action} = request.query;
-        const words = await Word.getWords(action);
+        const {action, userName} = request.query;
+
+        console.log(action, userName);
+        const words = await Word.getWords(action, userName);
 
         let result;
 
@@ -49,36 +51,34 @@ async function getWord(request, response) {
     }
 }
 
-async function getWord2(request, response) {
-    try {
+// async function getWordsByUser(request, response) {
+//     try {
         
-        const userId = request.query;     
-        
-        console.log(userId, "id del usuario")
+//         const {userName} = request.query;
 
-        const filters = {};
-    
-        if(userId) {
-            filters.userId =  userId;
-        }
+//         const filters = {};
 
-        const words = await Word.getWords2(filters);
+//         filters.userName = userName;
 
-        response.statusCode = 200;
-        response.json({
-            words
-        })
-    }
-    catch(error) {
-        console.error(error);
-        response.statusCode = 500;
-        response.json({
-            success: false,
-            message: 'Could not get Words',
-            error
-        });
-    }
-};
+//         console.log(filters, "Este es el filtro en el control")
+
+//         const wordsUser = await Word.getWordsByUser(filters);
+
+//         response.statusCode = 200;
+//         response.json({
+//             wordsUser
+//         })
+//     }
+//     catch(error) {
+//         console.error(error);
+//         response.statusCode = 500;
+//         response.json({
+//             success: false,
+//             message: 'Could not get Words',
+//             error
+//         });
+//     }
+// };
 
 async function getWordById(request, response) {
     try {
@@ -102,27 +102,6 @@ async function getWordById(request, response) {
     }
 };
 
-async function getWordsByUser(request, response) {
-    try {
-        const userId = request.params.userId;
-        
-        const words = await Word.getWordsByUser(userId);
-
-        response.statusCode = 200;
-        response.json({
-            words
-        })
-    }
-    catch(error) {
-        console.error(error);
-        response.statusCode = 500;
-        response.json({
-            success: false,
-            message: 'Could not get Word',
-            error
-        });
-    }
-};
 
 
 async function setWord(request, response) {
@@ -252,58 +231,31 @@ async function updateStatusWord(request, response) {
     }
 }
 
-async function getFilters(request, response) {
+async function getWordsByFilter(request, response) {
     try {
 
-        const {languages, countries, states, topics} = request.body; 
+        const {search} = request.query; 
 
-        // const filters = {};
+        const filters = {}
 
-        // if(search){
-        //     filters.meaning = { $regex: search };
-        //     filters.word = { $regex: search };
-        // } 
-        // if(language.length) filters.language = language;
-        // if(country.length) filters.country = country;
-        // if(state.length) filters.state = state;
-        // if(topic.length) filters.topic = topic;
+        if(search){
 
+            const REG_EXP_SEARCH = {$regex: search, $options: "i"};
 
-        let langs;
-        let counts;
-        let sts;
-        let top;
+            filters.$or = [
+                {word: REG_EXP_SEARCH},
+                {meaning: REG_EXP_SEARCH},
+                {example: REG_EXP_SEARCH},
+                {topic: REG_EXP_SEARCH},
+                {"translations.translate": REG_EXP_SEARCH},
+                {"complements.meaning": REG_EXP_SEARCH},
+                {"complements.example": REG_EXP_SEARCH},
+                {"complements.topic": REG_EXP_SEARCH},
+                {"complements.translations.translate": REG_EXP_SEARCH}
+            ]
+        }
 
-        langs = languages.map(element => {
-             return {"language": element};      
-        });
-
-        counts = countries.map(element => {
-            return {"country": element};      
-        });  
-
-        sts = states.map(element => {
-            return {"state": element};
-        })
-
-        top = topics.map(element => {
-            return {"topic": element};
-        })
-
-        const words = await Word.getWordsByFilters(langs, counts, sts, top);
-
-        // console.log(filters);
-
-        // const words = await Word.getWords(filters);
-
-
-        // Ejemplo de envío
-        // {
-        //     "languages":[""],
-        //     "countries":["Colombia"],
-        //     "states":[""],
-        //     "topics":["Expresiones despectivas"]
-        // }
+        const words = await Word.getWordsByFilters(filters);
 
         response.statusCode = 200;
         response.json({
@@ -322,16 +274,13 @@ async function getFilters(request, response) {
 };
 
 
-
-
 module.exports = {
     getWord,
-    getWord2,
+    // getWordsByUser,
     getWordById,
-    getWordsByUser,
+    getWordsByFilter,
     setWord,
     deleteWord,
     setNewItemWord,
-    updateStatusWord,
-    getFilters
+    updateStatusWord
 };

@@ -4,8 +4,9 @@ const wordController = require('../controllers/word.controller')
 const router = express.Router()
 
 router.get('/', wordController.getWord);
+router.get('/filters', wordController.getWordsByFilter)
 router.get('/:id', wordController.getWordById);
-router.get('/wordsByUser/:userId', wordController.getWord2);
+// router.get('/wordsByUser', wordController.getWordsByUser);
 router.post('/', wordController.setWord);
 router.delete('/:id', wordController.deleteWord);
 router.patch('/newItem/:id', wordController.setNewItemWord);
