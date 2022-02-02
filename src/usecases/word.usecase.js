@@ -66,21 +66,12 @@ async function getWords(action, userName) {
                         };
   }
   else{
-    select = [];
-    where = {"status": 2};
-    and = [{}];
-    or = [{}];
-    sort = {"createdAt": -1};
+    const words = await Word.find({})
+                          .where({"status": 2})
+                          .sort({"createdAt": -1});
+  
+    return words;
   }
-  
-  const words = await Word.find({})
-                          .select(select)
-                          .where(where)
-                          .and(and)
-                          .or(or)
-                          .sort(sort);
-  
-  return words;
 }
 
 
@@ -480,7 +471,6 @@ async function updateStatus(request) {
 module.exports = {
     getWords,
     getWordsByFilters,
-    // getWordsByUser,
     getWordsById,
     setWord,
     deleteWord,

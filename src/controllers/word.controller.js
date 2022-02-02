@@ -9,32 +9,6 @@ async function getWord(request, response) {
 
         console.log(action, userName);
         const words = await Word.getWords(action, userName);
-
-        // let result;
-
-        // if(action === "wordTranslations"){
-        //     result = words.map(({_id, word, meaning, translations}) => {
-        //         return {
-        //             idWord: _id,
-        //             word: word,
-        //             meaning: meaning,
-        //             translations
-        //         };
-        //     })
-        // }
-        // else if(action === "compTranslations"){
-        //     result = words.map(({_id, word, meaning, complements}) => {
-        //         return {
-        //             idWord: _id,
-        //             word: word,
-        //             meaning: meaning,
-        //             complements
-        //         };
-        //     })
-        // }
-        // else {
-        //     result = words;
-        // }  
         
         response.statusCode = 200;
         response.json({
@@ -51,34 +25,6 @@ async function getWord(request, response) {
     }
 }
 
-// async function getWordsByUser(request, response) {
-//     try {
-        
-//         const {userName} = request.query;
-
-//         const filters = {};
-
-//         filters.userName = userName;
-
-//         console.log(filters, "Este es el filtro en el control")
-
-//         const wordsUser = await Word.getWordsByUser(filters);
-
-//         response.statusCode = 200;
-//         response.json({
-//             wordsUser
-//         })
-//     }
-//     catch(error) {
-//         console.error(error);
-//         response.statusCode = 500;
-//         response.json({
-//             success: false,
-//             message: 'Could not get Words',
-//             error
-//         });
-//     }
-// };
 
 async function getWordById(request, response) {
     try {
@@ -276,7 +222,6 @@ async function getWordsByFilter(request, response) {
 
 module.exports = {
     getWord,
-    // getWordsByUser,
     getWordById,
     getWordsByFilter,
     setWord,

@@ -1,27 +1,9 @@
 const Language = require('../usecases/language.usecase');
 
 async function getLanguage(request, response) {
-    try {
-        const {language, country, state} = request.query;               
-        
-        // const query = {
-        //     $or: 
-        //     [
-        //         {
-        //             'language': language
-        //         },
-        //         {
-        //             'countries.country': country
-        //         },
-        //         {
-        //             'countries.states': state
-        //         }
-        //     ]            
-        // }
+    try { 
 
-        // if(language) filters.language = { $regex: language };        
-        // if(country) filters.country = { "countries.country" : country };
-        // if(state) filters.states = { "countries.states": state }
+        const {language, country} = request.query;
 
         const languages = await Language.getLanguages();
 
