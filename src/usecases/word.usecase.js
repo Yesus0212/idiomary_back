@@ -8,8 +8,6 @@ async function getWords(action, userName) {
 
   console.log(action, userName)
 
-  let select, where, and, or, sort;
-
   if(action !== "" && action !== undefined && action === "pendings" && (userName !== "" || userName === undefined)){
 
     const words = await Word.find({})
@@ -24,12 +22,12 @@ async function getWords(action, userName) {
                                   .sort({"complements.createdAt": -1});
 
     const wordTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "translations"])
+                                        .select(["_id", "word", "meaning", "language", "country", "state", "translations"])
                                         .where({"status": 2})
                                         .and([{"translations.status": 1}]); 
 
     const compTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "complements._id", "complements.translations"])
+                                        .select(["_id", "word", "meaning", "language", "country", "state", "complements._id", "complements.translations"])
                                         .where({"status": 2})
                                         .and([{"complements.status": 2},{"complements.translations.status": 1}]);
 
@@ -66,21 +64,12 @@ async function getWords(action, userName) {
                         };
   }
   else{
-    select = [];
-    where = {"status": 2};
-    and = [{}];
-    or = [{}];
-    sort = {"createdAt": -1};
+    const words = await Word.find({})
+                          .where({"status": 2})
+                          .sort({"createdAt": -1});
+  
+    return words;
   }
-  
-  const words = await Word.find({})
-                          .select(select)
-                          .where(where)
-                          .and(and)
-                          .or(or)
-                          .sort(sort);
-  
-  return words;
 }
 
 
@@ -480,10 +469,9 @@ async function updateStatus(request) {
 module.exports = {
     getWords,
     getWordsByFilters,
-    // getWordsByUser,
     getWordsById,
     setWord,
-    deleteWord,
     setNewItem,
-    updateStatus
+    updateStatus,
+    deleteWord
 };
