@@ -88,11 +88,41 @@ async function updateNumber(idUser, statusWord) {
 };
 
 
+// Función para actualizar la información de un usuario 
+async function setNewData(request) {
+
+  const {id, language, country, state, urlImage, filters} = request;   
+
+  const updateUser = await User.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    {
+      $set: {
+        language,
+        country,
+        state,
+        urlImage,
+        filters
+      },
+    },
+    {     
+      new: true,
+      useFindAndModify: true,
+      returnNewDocument: true,
+    }
+  );  
+  
+  return updateUser;   
+}
+  
+
+
 // Función de eliminación de user por ID
 async function deleteUser(request) {
-    const id = request;         
-    const deleteUser = await User.findByIdAndDelete(id);
-    return deleteUser;
+  const id = request;         
+  const deleteUser = await User.findByIdAndDelete(id);
+  return deleteUser;
 }
 
 
@@ -120,6 +150,7 @@ module.exports = {
     getUsersById,
     setUser,
     updateNumber,
+    setNewData,
     deleteUser,
     getAuthenticate
 };

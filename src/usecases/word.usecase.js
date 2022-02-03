@@ -22,12 +22,12 @@ async function getWords(action, userName) {
                                   .sort({"complements.createdAt": -1});
 
     const wordTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "translations"])
+                                        .select(["_id", "word", "meaning", "language", "country", "state", "translations"])
                                         .where({"status": 2})
                                         .and([{"translations.status": 1}]); 
 
     const compTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "complements._id", "complements.translations"])
+                                        .select(["_id", "word", "meaning", "language", "country", "state", "complements._id", "complements.translations"])
                                         .where({"status": 2})
                                         .and([{"complements.status": 2},{"complements.translations.status": 1}]);
 
@@ -73,9 +73,12 @@ async function getWords(action, userName) {
 }
 
 
+// Obtiene las palabras que hagan match con los filtros
 async function getWordsByFilters(filters) {
 
-  const words = await Word.find(filters);
+  const words = await Word.find(filters)
+                          .where({"status": 2})
+                          .sort({"createdAt": -1});
 
   return words;
 }
