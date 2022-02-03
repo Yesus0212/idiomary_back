@@ -73,9 +73,12 @@ async function getWords(action, userName) {
 }
 
 
+// Obtiene las palabras que hagan match con los filtros
 async function getWordsByFilters(filters) {
 
-  const words = await Word.find(filters);
+  const words = await Word.find(filters)
+                          .where({"status": 2})
+                          .sort({"createdAt": -1});
 
   return words;
 }
