@@ -180,12 +180,11 @@ async function updateStatusWord(request, response) {
 async function getWordsByFilter(request, response) {
     try {
 
-        const {search} = request.query; 
+        const {search, language, country, state, topic} = request.query; 
 
         const filters = {}
 
         if(search){
-
             const REG_EXP_SEARCH = {$regex: search, $options: "i"};
 
             filters.$or = [
@@ -199,6 +198,19 @@ async function getWordsByFilter(request, response) {
                 {"complements.topic": REG_EXP_SEARCH},
                 {"complements.translations.translate": REG_EXP_SEARCH}
             ]
+        }
+        
+        if(language){
+            filters.$and = [{language}];
+        }
+        if(country){
+            filters.$and = [{country}];
+        }
+        if(state){
+            filters.$and = [{state}];
+        }
+        if(topic){
+            filters.$and = [{topic}];
         }
 
         const words = await Word.getWordsByFilters(filters);
