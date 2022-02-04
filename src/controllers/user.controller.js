@@ -93,7 +93,7 @@ async function getLogin(request, response) {
         if(token.error === 401){
             response.statusCode = 401;
             response.json({
-                success: true,
+                success: false,
                 message: "¡Usuario o contraseña son incorrectos, veríficalo!"
             });
         }
