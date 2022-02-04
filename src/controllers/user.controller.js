@@ -51,12 +51,12 @@ async function getUserById(request, response) {
 async function setUser(request, response) {
     try {
         const newUser = request.body;
-        const token = await User.setUser(newUser);
+        const result = await User.setUser(newUser);
 
         response.statusCode = 201;
         response.json({
             success: true,
-            token
+            result
         })
     }
     catch(error) {        

@@ -42,7 +42,12 @@ async function setUser(request) {
       { expiresIn: process.env.TOKEN_EXPIRES},
     );
 
-    return token;
+    return {
+      userId: setUser._id,
+      userName,
+      userType,
+      token
+    };
 }
 
 
@@ -53,7 +58,6 @@ async function getLogin(request) {
   const getUser = await User.findOne({userName});
 
   if(getUser) {
-
     const valida = (password === getUser.password);
     if(valida){
       const token = jwt.sign(
@@ -62,9 +66,12 @@ async function getLogin(request) {
         { expiresIn: process.env.TOKEN_EXPIRES},
       );
 
-      console.log(token)
-
-      return token;
+      return {
+        userId: getUser._id,
+        userName: getUser.userName,
+        userType: getUser.userType,
+        token
+      }
     }
   }
   else {
