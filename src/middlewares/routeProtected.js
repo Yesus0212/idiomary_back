@@ -1,5 +1,4 @@
 const express = require('express');
-const req = require('express/lib/request');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -12,14 +11,18 @@ rutasProtegidas.use((request, response, next) => {
     if(token) {
         jwt.verify(token, process.env.API_KEY, (error, decoded) => {
             if(error){
+                console.log(error)
+                response.statusCode = 403;
                 return response.json({ success: false, message:  'Token inválida'});
             }else {
-                request.decoded = decoded;
+                const {exp} = decoded;
+                console.log(Date.now())
                 next();
             }
         })
     }
     else {
+        response.statusCode = 403;
         response.send({
             success: false,
             message: 'Token no proveída'

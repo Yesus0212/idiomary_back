@@ -86,6 +86,9 @@ async function setUser(request, response) {
 async function getLogin(request, response) {
     try {
         const {userName, password} = request.body;
+
+        console.log(request.body)
+
         const token = await User.getLogin({userName, password});
 
         console.log(token)
@@ -106,7 +109,7 @@ async function getLogin(request, response) {
         }
     }
     catch(error) {     
-        response.statusCode = 200;   
+        response.statusCode = 500;   
         response.json({            
             success: false,
             error
