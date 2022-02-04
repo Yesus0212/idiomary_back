@@ -51,12 +51,12 @@ async function getUserById(request, response) {
 async function setUser(request, response) {
     try {
         const newUser = request.body;
-        const createUser = await User.setUser(newUser);
+        const token = await User.setUser(newUser);
 
-        response.statusCode = 200;
+        response.statusCode = 201;
         response.json({
             success: true,
-            newUser
+            token
         })
     }
     catch(error) {        
@@ -70,7 +70,7 @@ async function setUser(request, response) {
             }
         }
         else{
-            response.statusCode = 500;
+            response.statusCode = 400;
             result = error;
         }
 
@@ -81,6 +81,39 @@ async function setUser(request, response) {
         });
     }
 };
+
+
+async function getLogin(request, response) {
+    try {
+        const {userName, password} = request.body;
+        const token = await User.getLogin({userName, password});
+
+        console.log(token)
+
+        if(token.error === 401){
+            response.statusCode = 401;
+            response.json({
+                success: true,
+                message: "¡Usuario o contraseña son incorrectos, veríficalo!"
+            });
+        }
+        else {
+            response.statusCode = 200;
+            response.json({
+                success: true,
+                token
+            });
+        }
+    }
+    catch(error) {     
+        response.statusCode = 200;   
+        response.json({            
+            success: false,
+            error
+        });
+    }
+};
+
 
 // Función para actualizar las palabras de un usuario, una vez que la palabra es creada, validada o cancelada
 async function updateNumberWords(request, response) {
@@ -180,6 +213,7 @@ module.exports = {
     getUser,
     getUserById,
     setUser,
+    getLogin,
     updateNumberWords,
     deleteUser,
     updateUser,
