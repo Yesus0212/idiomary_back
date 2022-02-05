@@ -1,4 +1,7 @@
 const User = require('../models/user.model');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 
 // Función de consulta de todos los Users y filtrado
 async function getUsers(filters) {
@@ -30,59 +33,52 @@ async function setUser(request) {
         points,
         filters
     });
-    return setUser;
+
+    // Se crea el token para enviarlo de regreso
+    const token = jwt.sign(
+      { userId: setUser._id, userName, userType },
+      process.env.API_KEY,
+      { expiresIn: process.env.TOKEN_EXPIRES},
+    );
+
+    return {
+      userId: setUser._id,
+      userName,
+      userType,
+      token
+    };
 }
 
-// Actualiza el numero de palabras de un usuario
-async function updateNumber(idUser, statusWord) {
 
-  let updateNumber;
- 
-  switch (statusWord) {
-    case 1:
-      updateNumber = await User.findOneAndUpdate(
-        {
-          _id: idUser,
-        },
-        {
-          $inc:{
-            inValidation: 1
-          }
-        }            
+// Función para validar el acceso de un usuario
+async function getLogin(request) {
+  const {userName, password} = request;
+
+  const getUser = await User.findOne({userName});
+
+  if(getUser) {
+    const valida = (password === getUser.password);
+    if(valida){
+      const token = jwt.sign(
+        { userId: getUser._id, userName: getUser.userName, userType: getUser.userType },
+        process.env.API_KEY,
+        { expiresIn: process.env.TOKEN_EXPIRES},
       );
-      break;
-    case 2:
-      updateNumber = await User.findOneAndUpdate(
-        {
-          _id: idUser,
-        },
-        {
-          $inc: {
-            inValidation: -1,
-            validated: 1
-          }
-        }
-      );            
-      break;
-    case 3:
-      updateNumber = await User.findOneAndUpdate(
-        {
-          _id: idUser,
-        },
-        {
-          $inc: {
-            inValidation: -1,
-            canceled: 1
-          }
-        }
-      );         
-      break;
-    default:
-      updateNumber = "Invalid Action";
-      break;
+
+      return {
+        userId: getUser._id,
+        userName: getUser.userName,
+        userType: getUser.userType,
+        token
+      }
+    }
   }
-  return updateNumber;
-};
+  else {
+    return {
+      error: 401
+    }
+  }
+}
 
 
 // Función para actualizar la información de un usuario 
@@ -114,7 +110,6 @@ async function setNewData(request) {
 }
   
 
-
 // Función de eliminación de user por ID
 async function deleteUser(request) {
   const id = request;         
@@ -124,10 +119,10 @@ async function deleteUser(request) {
 
 
 module.exports = {    
-  getUsers,
-  getUsersById,
-  setUser,
-  updateNumber,
-  deleteUser,
-  setNewData
+    getUsers,
+    getUsersById,
+    setUser,
+    getLogin,
+    setNewData,
+    deleteUser
 };
