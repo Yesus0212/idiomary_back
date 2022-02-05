@@ -1,13 +1,13 @@
 const nodemailer = require('nodemailer');
 
-function createTransport ({MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASS}) {
+function createTransport ({SES_HOST, SES_PORT, SES_USER, SES_PASS}) {
     
     const transport = nodemailer.createTransport({
-        host: MAIL_HOST,
-        port: MAIL_PORT,
+        host: SES_HOST,
+        port: SES_PORT,
         auth: {
-          user: MAIL_USER,
-          pass: MAIL_PASS
+          user: SES_USER,
+          pass: SES_PASS
         }
     });    
     

@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-const mail = require('./src/lib/email');
 const dbConnect = require('./src/lib/db');
 const server = require('./src/lib/server');
 
@@ -15,5 +14,3 @@ dbConnect(process.env)
     .catch((error) => {
         console.error(error);
     })
-
-mail(process.env);
