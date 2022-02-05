@@ -8,8 +8,6 @@ async function getWords(filters) {
                             .or(filters);
     return words;
   }
-}
-
 
 // Obtiene las palabras que hagan match con los filtros
 async function getWordsByFilters(filters) {
