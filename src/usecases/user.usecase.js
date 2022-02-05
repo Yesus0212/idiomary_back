@@ -33,16 +33,101 @@ async function setUser(request) {
     return setUser;
 }
 
+// Actualiza el numero de palabras de un usuario
+async function updateNumber(idUser, statusWord) {
+
+  let updateNumber;
+ 
+  switch (statusWord) {
+    case 1:
+      updateNumber = await User.findOneAndUpdate(
+        {
+          _id: idUser,
+        },
+        {
+          $inc:{
+            inValidation: 1
+          }
+        }            
+      );
+      break;
+    case 2:
+      updateNumber = await User.findOneAndUpdate(
+        {
+          _id: idUser,
+        },
+        {
+          $inc: {
+            inValidation: -1,
+            validated: 1
+          }
+        }
+      );            
+      break;
+    case 3:
+      updateNumber = await User.findOneAndUpdate(
+        {
+          _id: idUser,
+        },
+        {
+          $inc: {
+            inValidation: -1,
+            canceled: 1
+          }
+        }
+      );         
+      break;
+    default:
+      updateNumber = "Invalid Action";
+      break;
+  }
+  return updateNumber;
+};
+
+
+// Función para actualizar la información de un usuario 
+async function setNewData(request) {
+
+  const {id, language, country, state, urlImage, filters} = request;   
+
+  const updateUser = await User.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    {
+      $set: {
+        language,
+        country,
+        state,
+        urlImage,
+        filters
+      },
+    },
+    {     
+      new: true,
+      useFindAndModify: true,
+      returnNewDocument: true,
+    }
+  );  
+  
+  return updateUser;   
+}
+  
+
+
 // Función de eliminación de user por ID
 async function deleteUser(request) {
-    const id = request;         
-    const deleteUser = await User.findByIdAndDelete(id);
-    return deleteUser;
+  const id = request;         
+  const deleteUser = await User.findByIdAndDelete(id);
+  return deleteUser;
 }
 
-module.exports = {
-    getUsers,
-    getUsersById,
-    setUser,
-    deleteUser,
+
+module.exports = {    
+  getUsers,
+  getUsersById,
+  setUser,
+  updateNumber,
+  deleteUser,
+  setNewData
 };

@@ -46,6 +46,10 @@ const complementSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
+        imgUser: {
+            type: String,
+            required: false,
+        },
         meaning: {
             type: String,
             required: false,

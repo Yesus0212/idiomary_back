@@ -65,7 +65,7 @@ async function setUser(request, response) {
         if(error.code === 11000){
             response.statusCode = 412;
             result = {
-                "error": "1100",
+                "error": "11000",
                 "value": "Correo o usuario duplicados"
             }
         }
@@ -82,6 +82,29 @@ async function setUser(request, response) {
     }
 };
 
+// Función para actualizar las palabras de un usuario, una vez que la palabra es creada, validada o cancelada
+async function updateNumberWords(request, response) {
+    try {
+        const {idUser, statusWord} = request;
+        const updateNumbers = await User.updateNumber({idUser, statusWord});
+
+        response.statusCode = 200;
+        response.json({
+            success: true,
+            updateNumbers
+        })
+
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not update a Word',
+            error
+        });
+    }
+}
 
 async function deleteUser(request, response) {
     try {
@@ -107,9 +130,38 @@ async function deleteUser(request, response) {
 };
 
 
+// Función para actualizar el estatus de una palabra
+async function updateUser(request, response) {
+    try {
+        const id = request.params.id;
+        const { language, country, state, urlImage, filters } = request.body;
+
+        // Se utiliza para actualizar la información de un usuario
+        const update = await User.setNewData({id, language, country, state, urlImage, filters});
+
+        response.statusCode = 200;
+        response.json({
+            success: true,
+            update
+        });
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not insert a new Item a Word',
+            error
+        });
+    }
+}
+
+
 module.exports = {
     getUser,
     getUserById,
     setUser,
+    updateNumberWords,
     deleteUser,
+    updateUser,
 };
