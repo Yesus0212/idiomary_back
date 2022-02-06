@@ -1,5 +1,6 @@
 const express = require('express');
 const wordController = require('../controllers/word.controller')
+const routeProtected = require('../middlewares/routeProtected')
 
 const router = express.Router()
 

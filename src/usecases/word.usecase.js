@@ -2,76 +2,12 @@ const Word = require('../models/word.model');
 const User = require('../models/user.model');
 const mongoose = require ('mongoose');
 
-
-// Función de consulta de todos los Words y filtrado por palabra
-async function getWords(action, userName) {
-
-  console.log(action, userName)
-
-  if(action !== "" && action !== undefined && action === "pendings" && (userName !== "" || userName === undefined)){
-
-    const words = await Word.find({})
-                            .where({"status": 1})
-                            .select(["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"])
-                            .sort({"createdAt": -1});
-
-    const complements = await Word.find({})
-                                  .select(["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"])
-                                  .where({"status": 2})
-                                  .and([{"complements.status": 1}])
-                                  .sort({"complements.createdAt": -1});
-
-    const wordTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "language", "country", "state", "translations"])
-                                        .where({"status": 2})
-                                        .and([{"translations.status": 1}]); 
-
-    const compTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "language", "country", "state", "complements._id", "complements.translations"])
-                                        .where({"status": 2})
-                                        .and([{"complements.status": 2},{"complements.translations.status": 1}]);
-
-    return pendings = {
-                        words, 
-                        complements, 
-                        wordTranslations, 
-                        compTranslations
-                      };
-  }
-  else if(userName !== "" && userName !== undefined && (action === "" || action === undefined)){
-
-    const words = await Word.find({userName: userName})
-                          .select(["_id", "word", "likes", "status", "reason"])
-                          .sort({"createdAt": -1});
-
-    const complements = await Word.find({"complements.userName": userName})
-                                .select(["complements._id", "word", "complements.likes", "complements.status", "complements.reason"])
-                                .sort({"complements.createdAt": -1});
-  
-    const wordTranslations = await Word.find({"translations.userName": userName})
-                                      .select(["translations._id", "translations.translate", "translations.status", "translations.reason"])
-                                      .sort({"createdAt": -1});
-
-    const compTranslations = await Word.find({"complements.translations.userName": userName})
-                                      .select(["complements.translations._id", "complements.translations.translate", "complements.translations.status", "complements.translations.reason"])
-                                      .sort({"complements.createdAt": -1});
-
-    return wordsUser = {
-                          words, 
-                          complements, 
-                          wordTranslations, 
-                          compTranslations
-                        };
-  }
-  else{
-    const words = await Word.find({})
-                          .where({"status": 2})
-                          .sort({"createdAt": -1});
-  
+// Función de consulta de todos los Words y filtrado
+async function getWords(filters) {
+    const words = await Word.find()
+                            .or(filters);
     return words;
   }
-}
-
 
 // Obtiene las palabras que hagan match con los filtros
 async function getWordsByFilters(filters) {
