@@ -45,11 +45,9 @@ async function setUser(request) {
         { expiresIn: process.env.TOKEN_EXPIRES},
       );
 
-      mailUser.registerMail(setUser.userName);
+      // mailUser.registerMail(setUser.userName);
 
-    }
-
-    
+    }    
 
     return {
       userId: setUser._id,
