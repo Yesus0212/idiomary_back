@@ -4,7 +4,9 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 
-function sendMail (userName) {
+function registerMail(userName) {
+
+    console.log(userName, "nombre del usuario")
     
     const transport = nodemailer.createTransport({
         host: process.env.SES_HOST,
@@ -15,7 +17,7 @@ function sendMail (userName) {
         }
     });
     
-    message = {
+    const message = {
         from: "jesussolispadron@gmail.com",
         to: "jesussolispadron@gmail.com",
         subject: "Prueba de envio",
@@ -31,4 +33,6 @@ function sendMail (userName) {
 }
 
 
-module.exports = sendMail;
+module.exports = {
+    registerMail
+};

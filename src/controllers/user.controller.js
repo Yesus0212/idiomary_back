@@ -1,5 +1,4 @@
 const User = require('../usecases/user.usecase');
-const registerMail = require('../templates/userRegister');
 
 async function getUser(request, response) {
     try {
@@ -60,7 +59,7 @@ async function setUser(request, response) {
             result
         })
 
-        registerMail.sendMail(newUser.userName);
+        
     }
     catch(error) {        
         let result;
