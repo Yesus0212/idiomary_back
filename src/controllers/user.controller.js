@@ -58,6 +58,8 @@ async function setUser(request, response) {
             success: true,
             result
         })
+
+        
     }
     catch(error) {        
         let result;

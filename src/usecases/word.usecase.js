@@ -70,6 +70,7 @@ async function getWords(action, userName) {
   
     return words;
   }
+
 }
 
 async function getWordsByFilters(filters) {

@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
+const mailUser = require('../templates/userRegister');
 require('dotenv').config();
 
 
@@ -34,12 +35,19 @@ async function setUser(request) {
         filters
     });
 
-    // Se crea el token para enviarlo de regreso
-    const token = jwt.sign(
-      { userId: setUser._id, userName, userType },
-      process.env.API_KEY,
-      { expiresIn: process.env.TOKEN_EXPIRES},
-    );
+    let token;
+
+    if(setUser){
+      // Se crea el token para enviarlo de regreso
+      token = jwt.sign(
+        { userId: setUser._id, userName, userType },
+        process.env.API_KEY,
+        { expiresIn: process.env.TOKEN_EXPIRES},
+      );
+
+      // mailUser.registerMail(setUser.userName);
+
+    }    
 
     return {
       userId: setUser._id,
