@@ -72,7 +72,6 @@ async function getWords(action, userName) {
   }
 }
 
-
 async function getWordsByFilters(filters) {
 
   const words = await Word.find(filters);
