@@ -15,8 +15,6 @@ rutasProtegidas.use((request, response, next) => {
                 response.statusCode = 403;
                 return response.json({ success: false, message:  'Token inválida'});
             }else {
-                const {exp} = decoded;
-                console.log(Date.now())
                 next();
             }
         })
