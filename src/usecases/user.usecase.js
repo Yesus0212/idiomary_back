@@ -60,9 +60,9 @@ async function setUser(request) {
 
 // Función para validar el acceso de un usuario
 async function getLogin(request) {
-  const {userName, password} = request;
+  const {email, password} = request;
 
-  const getUser = await User.findOne({userName});
+  const getUser = await User.findOne({email});
 
   if(getUser) {
     const valida = (password === getUser.password);
