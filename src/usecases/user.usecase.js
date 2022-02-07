@@ -36,7 +36,7 @@ async function setUser(request) {
 
     // Se crea el token para enviarlo de regreso
     const token = jwt.sign(
-      { userId: setUser._id, userName, userType },
+      { userId: setUser._id, userName, userType, filter: false, filters },
       process.env.API_KEY,
       { expiresIn: process.env.TOKEN_EXPIRES},
     );
@@ -59,8 +59,19 @@ async function getLogin(request) {
   if(getUser) {
     const valida = (password === getUser.password);
     if(valida){
+
+      let filter = false;
+
+      if(getUser.filter > 0)   filter = true;
+
       const token = jwt.sign(
-        { userId: getUser._id, userName: getUser.userName, userType: getUser.userType },
+        { 
+          userId: getUser._id, 
+          userName: getUser.userName, 
+          userType: getUser.userType,
+          filter,
+          filters: getUser.filters
+        },
         process.env.API_KEY,
         { expiresIn: process.env.TOKEN_EXPIRES},
       );
