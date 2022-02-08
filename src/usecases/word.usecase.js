@@ -84,7 +84,9 @@ async function getWords(action, userName) {
 
 function getComplements(comp) {
 
-  const final = comp.map(({word, complements}) => {
+  let final;
+
+  comp.map(({word, complements}) => {
 
     const co = complements.map((complement) => {
 
@@ -101,11 +103,12 @@ function getComplements(comp) {
       
     })
    
-    return co;
+    final = co;
 
   })
 
-  return final;
+  return final
+
 }
 
 

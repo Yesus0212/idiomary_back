@@ -2,24 +2,20 @@ const mongoose = require ('mongoose')
 
 const filterSchema = new mongoose.Schema(
     {
-        languages: {
-            type: Array,
-            of: String,
+        language: {
+            type: String,
             required: false,
         },
-        countries: {
-            type: Array,
-            of: String,
+        country: {
+            type: String,
             required: false,
         },
-        states: {
-            type: Array,
-            of: String,
+        state: {
+            type: String,
             required: false,
         },
-        topics: {
-            type: Array,
-            of: String,
+        topic: {
+            type: String,
             required: false,
         },        
     }
