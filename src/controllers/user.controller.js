@@ -120,30 +120,6 @@ async function getLogin(request, response) {
 };
 
 
-// Función para actualizar las palabras de un usuario, una vez que la palabra es creada, validada o cancelada
-async function updateNumberWords(request, response) {
-    try {
-        const {idUser, statusWord} = request;
-        const updateNumbers = await User.updateNumber({idUser, statusWord});
-
-        response.statusCode = 200;
-        response.json({
-            success: true,
-            updateNumbers
-        })
-
-    }
-    catch(error) {
-        console.error(error);
-        response.statusCode = 500;
-        response.json({
-            success: false,
-            message: 'Could not update a Word',
-            error
-        });
-    }
-}
-
 async function deleteUser(request, response) {
     try {
         const id = request.params.id;
@@ -167,25 +143,6 @@ async function deleteUser(request, response) {
     }
 };
 
-// Función para validar el usuario
-async function getAuthenticate(request, response) {
-    try {
-        const authenticate = await User.getAuthenticate();
-
-        response.statusCode = 200;
-        response.json({
-            success: true,
-            authenticate
-        })
-    }
-    catch(error) {
-        response.statusCode = 400;
-        response.json({
-            success: false,
-            message: 'Could not authenticated'
-        })
-    }
-}
 
 // Función para actualizar el estatus de una palabra
 async function updateUser(request, response) {
@@ -219,7 +176,6 @@ module.exports = {
     getUserById,
     setUser,
     getLogin,
-    updateNumberWords,
     deleteUser,
     updateUser,
 };
