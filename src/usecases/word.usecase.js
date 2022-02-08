@@ -84,31 +84,28 @@ async function getWords(action, userName) {
 
 function getComplements(comp) {
 
-  let final;
-
-  comp.map(({word, complements}) => {
+  const final = comp.map(({word, complements}) => {
 
     const co = complements.map((complement) => {
 
       const coFinal = {
-        idComplement: complement._id,
+        _id: complement._id,
         word,
         meaning: complement.meaning,
+        likes: complement.likes,
         status: complement.status,
-        reason: complement.reason,
-        likes: complement.likes
+        reason: complement.reason,        
       }
 
       return coFinal;
       
     })
    
-    final = co;
+    return co;
 
   })
 
-  return final
-
+  return final;
 }
 
 
@@ -119,9 +116,10 @@ function getWordTranslations(wTra) {
     const tra = translations.map((translation) => {
 
       const traFinal = {
-        idTranslate: translation._id,
+        _id: translation._id,
         word,
         meaning,
+        likes: 0,
         translate: translation.translate,
         status: translation.status,
         reason: translation.reason
@@ -159,9 +157,10 @@ function getCompTranslations(cTra) {
       const final = translations.translations.map((translation) => {
 
         const traFinal = {
-          idTranslate: translation._id,
+          _id: translation._id,
           word,
           meaning: translations.meaning,
+          likes: 0,
           translate: translation.translate,
           status: translation.status,
           reason: translation.reason
