@@ -180,7 +180,7 @@ async function updateStatusWord(request, response) {
 async function getWordsByFilter(request, response) {
     try {
 
-        const {search, language, country, state, topic} = request.query; 
+        const {language, country, state, topic, search} = request.query; 
 
         const filters = {}
 
@@ -201,16 +201,16 @@ async function getWordsByFilter(request, response) {
         }
         
         if(language){
-            filters.$and = [{language}];
+            filters.language = language;
         }
         if(country){
-            filters.$and = [{country}];
+            filters.country = country;
         }
         if(state){
-            filters.$and = [{state}];
+            filters.state = state;
         }
         if(topic){
-            filters.$and = [{topic}];
+            filters.topic = topic;
         }
 
         const words = await Word.getWordsByFilters(filters);

@@ -58,6 +58,8 @@ async function setUser(request, response) {
             success: true,
             result
         })
+
+        
     }
     catch(error) {        
         let result;
@@ -85,11 +87,11 @@ async function setUser(request, response) {
 
 async function getLogin(request, response) {
     try {
-        const {userName, password} = request.body;
+        const {email, password} = request.body;
 
         console.log(request.body)
 
-        const token = await User.getLogin({userName, password});
+        const token = await User.getLogin({email, password});
 
         console.log(token)
 
@@ -97,7 +99,7 @@ async function getLogin(request, response) {
             response.statusCode = 401;
             response.json({
                 success: false,
-                message: "¡Usuario o contraseña son incorrectos, veríficalo!"
+                message: "¡Correo o contraseña incorrectos, veríficalo!"
             });
         }
         else {

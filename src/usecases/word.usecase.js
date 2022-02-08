@@ -1,6 +1,7 @@
 const Word = require('../models/word.model');
 const User = require('../models/user.model');
 const mongoose = require ('mongoose');
+const { off } = require('../models/word.model');
 
 
 // Función de consulta de todos los Words y filtrado por palabra
@@ -41,20 +42,27 @@ async function getWords(action, userName) {
   else if(userName !== "" && userName !== undefined && (action === "" || action === undefined)){
 
     const words = await Word.find({userName: userName})
-                          .select(["_id", "word", "likes", "status", "reason"])
-                          .sort({"createdAt": -1});
+                            .select(["_id", "word", "meaning", "likes", "status", "reason"])
+                            .sort({"createdAt": -1});
 
-    const complements = await Word.find({"complements.userName": userName})
-                                .select(["complements._id", "word", "complements.likes", "complements.status", "complements.reason"])
-                                .sort({"complements.createdAt": -1});
+    const comp = await Word.find({"complements.userName": userName})
+                           .select(["complements._id", "word", "complements.meaning", "complements.likes", "complements.status", "complements.reason"])
+                           .sort({"complements.createdAt": -1});
+
+    // Render respuesta de consulta a la base de palabras
+    const complements = getComplements(comp)
   
-    const wordTranslations = await Word.find({"translations.userName": userName})
-                                      .select(["translations._id", "translations.translate", "translations.status", "translations.reason"])
-                                      .sort({"createdAt": -1});
+    const wTra = await Word.find({"translations.userName": userName})
+                           .select(["word", "meaning", "translations._id", "translations.translate", "translations.status", "translations.reason"])
+                           .sort({"createdAt": -1});
 
-    const compTranslations = await Word.find({"complements.translations.userName": userName})
-                                      .select(["complements.translations._id", "complements.translations.translate", "complements.translations.status", "complements.translations.reason"])
-                                      .sort({"complements.createdAt": -1});
+    const wordTranslations = getWordTranslations(wTra);
+
+    const cTra = await Word.find({"complements.translations.userName": userName})
+                           .select(["word", "complements.meaning", "complements.translations._id", "complements.translations.translate", "complements.translations.status", "complements.translations.reason"])
+                           .sort({"complements.createdAt": -1});
+                    
+    const compTranslations = getCompTranslations(cTra);
 
     return wordsUser = {
                           words, 
@@ -70,7 +78,108 @@ async function getWords(action, userName) {
   
     return words;
   }
+
 }
+
+
+function getComplements(comp) {
+
+  const final = comp.map(({word, complements}) => {
+
+    const co = complements.map((complement) => {
+
+      const coFinal = {
+        _id: complement._id,
+        word,
+        meaning: complement.meaning,
+        likes: complement.likes,
+        status: complement.status,
+        reason: complement.reason,        
+      }
+
+      return coFinal;
+      
+    })
+   
+    return co;
+
+  })
+
+  return final;
+}
+
+
+function getWordTranslations(wTra) {
+
+  const final = wTra.map(({word, meaning, translations}) => {
+
+    const tra = translations.map((translation) => {
+
+      const traFinal = {
+        _id: translation._id,
+        word,
+        meaning,
+        likes: 0,
+        translate: translation.translate,
+        status: translation.status,
+        reason: translation.reason
+      }
+
+      return traFinal;
+      
+    })
+   
+    return tra;
+
+  })
+
+  return final;
+
+}
+
+function getCompTranslations(cTra) {  
+  
+  const comTra = cTra.map(({word, complements}) => {
+
+    const com = complements.filter(({meaning, translations}) => {
+
+      if(translations.length > 0){
+        return {
+          meaning, 
+          translations
+        }
+      }      
+
+    })
+    
+    const finalCom = com.map((translations) => {     
+      
+      const final = translations.translations.map((translation) => {
+
+        const traFinal = {
+          _id: translation._id,
+          word,
+          meaning: translations.meaning,
+          likes: 0,
+          translate: translation.translate,
+          status: translation.status,
+          reason: translation.reason
+        }
+  
+        return traFinal;
+      })
+
+      return final;
+
+    })
+
+    return finalCom;
+
+  })
+  
+  return comTra;
+}
+
 
 
 async function getWordsByFilters(filters) {
