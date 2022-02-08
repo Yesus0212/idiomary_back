@@ -21,71 +21,79 @@ async function getUsersById(request) {
 
 // Función de inserción de user nuevo
 async function setUser(request) {
-    const {userName, email, password, language, country, state, urlImage, userType, points, filters} = request;    
-    const setUser = await User.create({
-        userName,
-        email,
-        password,
-        language,
-        country,
-        state,
-        urlImage,
-        userType, 
-        points,
-        filters
-    });
-
-    let token;
-
-    if(setUser){
-      // Se crea el token para enviarlo de regreso
-      token = jwt.sign(
-        { userId: setUser._id, userName, userType },
-        process.env.API_KEY,
-        { expiresIn: process.env.TOKEN_EXPIRES},
-      );
-
-      // mailUser.registerMail(setUser.userName);
-
-    }    
-
-    return {
-      userId: setUser._id,
+  const {userName, email, password, language, country, state, urlImage, userType, points, filters} = request;    
+  const setUser = await User.create({
       userName,
-      userType,
-      token
-    };
+      email,
+      password,
+      language,
+      country,
+      state,
+      urlImage,
+      userType, 
+      points,
+      filters
+  });
+
+  // Se crea el token para enviarlo de regreso
+  const token = jwt.sign(
+    { userId: setUser._id, userName, userType, filter: false, filters },
+    process.env.API_KEY,
+    { expiresIn: process.env.TOKEN_EXPIRES},
+  );
+
+  return {
+    userId: setUser._id,
+    userName,
+    userType,
+    filter: false,
+    filters,
+    token
+  };
 }
 
 
 // Función para validar el acceso de un usuario
 async function getLogin(request) {
-  const {email, password} = request;
+const {email, password} = request;
 
-  const getUser = await User.findOne({email});
+const getUser = await User.findOne({email});
 
-  if(getUser) {
-    const valida = (password === getUser.password);
-    if(valida){
-      const token = jwt.sign(
-        { userId: getUser._id, userName: getUser.userName, userType: getUser.userType },
-        process.env.API_KEY,
-        { expiresIn: process.env.TOKEN_EXPIRES},
-      );
+if(getUser) {
+  const valida = (password === getUser.password);
+  if(valida){
 
-      return {
-        userId: getUser._id,
-        userName: getUser.userName,
+    let filter = false;
+
+    if(getUser.filters)   filter = true;
+
+    const token = jwt.sign(
+      { 
+        userId: getUser._id, 
+        userName: getUser.userName, 
         userType: getUser.userType,
-        token
-      }
-    }
-  }
-  else {
+        filter,
+        filters: getUser.filters
+      },
+      process.env.API_KEY,
+      { expiresIn: process.env.TOKEN_EXPIRES},
+    );
+
     return {
-      error: 401
+      userId: getUser._id,
+      userName: getUser.userName,
+      userType: getUser.userType,
+      filter,
+      userFilter: getUser.filters,
+      token
     }
   }
+}
+else {
+  return {
+    error: 401
+  }
+}
 }
 
 
