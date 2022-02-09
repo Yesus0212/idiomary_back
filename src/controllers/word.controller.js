@@ -147,8 +147,6 @@ async function getDetailWord(request, response) {
 
     try {
         const { idWord, idComplement, idTranslate } = request.query;
-
-        console.log("Aquí si entro")
     
         const result = await Word.getDetail({ idWord, idComplement, idTranslate });
 
@@ -156,7 +154,6 @@ async function getDetailWord(request, response) {
         response.json({
             result
         })
-
         
     } catch (error) {
         console.error(error);
@@ -167,10 +164,6 @@ async function getDetailWord(request, response) {
             error
         })
     }
-
-
-
-
 }
 
 
