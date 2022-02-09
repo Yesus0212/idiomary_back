@@ -142,6 +142,38 @@ async function setNewItemWord(request, response) {
 }
 
 
+// Función para obtener la información de un item a validar
+async function getDetailWord(request, response) {
+
+    try {
+        const { idWord, idComplement, idTranslate } = request.query;
+
+        console.log("Aquí si entro")
+    
+        const result = await Word.getDetail({ idWord, idComplement, idTranslate });
+
+        response.statusCode
+        response.json({
+            result
+        })
+
+        
+    } catch (error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not get word',
+            error
+        })
+    }
+
+
+
+
+}
+
+
 // Función para actualizar el estatus de una palabra
 async function updateStatusWord(request, response) {
     try {
@@ -176,6 +208,7 @@ async function updateStatusWord(request, response) {
         });
     }
 }
+
 
 async function getWordsByFilter(request, response) {
     try {
@@ -239,5 +272,6 @@ module.exports = {
     setWord,
     deleteWord,
     setNewItemWord,
+    getDetailWord,
     updateStatusWord
 };
