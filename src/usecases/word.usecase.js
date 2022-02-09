@@ -143,10 +143,7 @@ function getFilterCompTranslations(cTranslations){
       "language": complement.language,
       "country": complement.country,
       "state": complement.state,
-      "complements": [
-        finalComp
-      ]
-        
+      "complements": finalComp        
     }
   })
 
