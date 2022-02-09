@@ -2,7 +2,7 @@ const Word = require('../models/word.model');
 const User = require('../models/user.model');
 const UserType = require('../models/userType.model');
 const mongoose = require ('mongoose');
-
+const { type } = require('express/lib/response');
 
 
 // Función de consulta de todos los Words y filtrado por palabra
@@ -383,6 +383,129 @@ async function setNewItem (request) {
 };
 
 
+// Función para obtener un item especifico 
+async function getDetail(request) {
+  
+  const { idWord, idComplement, idTranslate } = request;
+
+  const word = await Word.findById(idWord);
+
+  const data = detailWord(word, idComplement, idTranslate);
+
+  return data;
+}
+
+
+function detailWord(word, idComplement, idTranslate) {
+
+  let data = {}
+
+  if(idComplement){
+    if(idTranslate){
+      const complement = word.complements.filter((complement) => {
+        return complement._id == idComplement;
+      });
+
+      let translation;
+
+      complement.filter(({translations}) => {
+        translation = translations.filter((translation) => {
+          return translation._id == idTranslate;
+        })
+      });
+
+      data = {
+        _id: complement[0]._id,
+        word: word.word,
+        userId: complement[0].userId,
+        userName: complement[0].userName,
+        imgUser: complement[0].imgUser,
+        meaning: complement[0].meaning,
+        example: complement[0].example,
+        urlImage: complement[0].urlImage,
+        language: complement[0].language,
+        country: complement[0].country,
+        state: complement[0].state,
+        topic: complement[0].topic,
+        likes: complement[0].likes,
+        createdAt: complement[0].createdAt,
+        translations: translation[0]
+      }
+      
+    }
+    else{
+      const complement = word.complements.filter((complement) => {
+        return complement._id == idComplement;
+      })
+
+      data = {
+        _id: complement[0]._id,
+        word: word.word,
+        userId: complement[0].userId,
+        userName: complement[0].userName,
+        imgUser: complement[0].imgUser,
+        meaning: complement[0].meaning,
+        example: complement[0].example,
+        urlImage: complement[0].urlImage,
+        language: complement[0].language,
+        country: complement[0].country,
+        state: complement[0].state,
+        topic: complement[0].topic,
+        likes: complement[0].likes,
+        createdAt: complement[0].createdAt,
+
+      }
+    }
+  }
+  else{
+    if(idTranslate){
+      const translate = word.translations.filter((translate) => {
+        return translate._id == idTranslate;
+      })
+
+      data = {
+        _id: word._id,
+        word: word.word,
+        userId: word.userId,
+        userName: word.userName,
+        imgUser: word.imgUser,
+        meaning: word.meaning,
+        example: word.example,
+        urlImage: word.urlImage,
+        language: word.language,
+        country: word.country,
+        state: word.state,
+        topic: word.topic,
+        likes: word.likes,
+        createdAt: word.createdAt,
+        translations: translate[0]
+      }
+    }
+    else{
+      data = {
+        _id: word._id,
+        word: word.word,
+        userId: word.userId,
+        userName: word.userName,
+        imgUser: word.imgUser,
+        meaning: word.meaning,
+        example: word.example,
+        urlImage: word.urlImage,
+        language: word.language,
+        country: word.country,
+        state: word.state,
+        topic: word.topic,
+        likes: word.likes,
+        createdAt: word.createdAt
+      }
+    }
+  }
+
+  return data;
+
+}
+
+
 // Función de actualización del estatus del documento
 async function updateStatus(request) {
 
@@ -653,6 +776,7 @@ module.exports = {
     getWordsById,
     setWord,
     setNewItem,
+    getDetail,
     updateStatus,
     deleteWord
 };
