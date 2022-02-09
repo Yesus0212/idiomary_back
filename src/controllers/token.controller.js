@@ -17,7 +17,9 @@ async function validateToken(request, response) {
                     response.send({
                         userId: decoded.userId,
                         userName: decoded.userName,
-                        userType: decoded.userType
+                        userType: decoded.userType,
+                        filter: decoded.filter,
+                        filters: decoded.filters
                     })
                 }
             })
