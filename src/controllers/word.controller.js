@@ -7,7 +7,6 @@ async function getWord(request, response) {
 
         const {action, userName} = request.query;
 
-        console.log(action, userName);
         const words = await Word.getWords(action, userName);
         
         response.statusCode = 200;
@@ -147,8 +146,6 @@ async function getDetailWord(request, response) {
 
     try {
         const { idWord, idComplement, idTranslate } = request.query;
-
-        console.log("Aquí si entro")
     
         const result = await Word.getDetail({ idWord, idComplement, idTranslate });
 

@@ -8,8 +8,6 @@ const { type } = require('express/lib/response');
 // Función de consulta de todos los Words y filtrado por palabra
 async function getWords(action, userName) {
 
-  console.log(action, userName)
-
   if(action !== "" && action !== undefined && action === "pendings" && (userName !== "" || userName === undefined)){
 
     const words = await Word.find({})
@@ -33,9 +31,9 @@ async function getWords(action, userName) {
                                         .where({"status": 2})
                                         .and([{"complements.status": 2},{"complements.translations.status": 1}]);
 
-    const complements = getComplements(comp);
-    const wordTranslations = getWordTranslations(wTranslations);
-    const compTranslations = getCompTranslations(cTranslations);
+    const complements = getFilterComplements(comp);
+    const wordTranslations = getFilterWordTranslations(wTranslations);
+    const compTranslations = getFilterCompTranslations(cTranslations);
                                       
 
     return pendings = {
@@ -85,6 +83,74 @@ async function getWords(action, userName) {
     return words;
   }
 
+}
+
+
+function getFilterComplements(comp) {
+
+  const final = comp.map((complement) => {
+    
+    const complements = complement.complements.filter((complement) => {
+      return complement.status == 1;
+    })    
+
+    return {
+      "_id": complement._id,
+      "word": complement.word,
+      "status": complement.status,
+      "complements": complements
+    }
+
+  })
+
+  return final;
+}
+
+function getFilterWordTranslations(wTranslations){
+
+  const final = wTranslations.map((translation) => {
+    
+    const translations = translation.translations.filter((translate) => {
+      return translate.status == 1;
+    })
+
+    return {
+      "_id": translation._id,
+      "word": translation.word,
+      "meaning": translation.meaning,
+      "language": translation.language,
+      "country": translation.country,
+      "state": translation.state,
+      "translations": translations
+    }
+  })
+
+  return final;
+}
+
+function getFilterCompTranslations(cTranslations){
+  
+  const final = cTranslations.map((complement) => {
+    
+    const finalComp = complement.complements.filter((complement) => {
+      return complement.translations.length > 0;
+    })
+
+    return {
+      "_id": complement._id,
+      "word": complement.word,
+      "meaning": complement.meaning,
+      "language": complement.language,
+      "country": complement.country,
+      "state": complement.state,
+      "complements": [
+        finalComp
+      ]
+        
+    }
+  })
+
+  return final;
 }
 
 
@@ -348,11 +414,9 @@ async function setNewItem (request) {
         
         let validation = 1;
         if(translations !== "" && translations !== undefined ){
-          console.log(validation, "antes actualizar");
           validation = 2;
         }
-
-        console.log(validation, "despues de actualizar");        
+  
         // Aquí actualiza el número de registros en validación del usuario 
         await User.findOneAndUpdate(
           {
@@ -366,7 +430,6 @@ async function setNewItem (request) {
         );         
         break;    
       default:
-        console.log("Invalid Action")
         return "Invalid Action"
     } 
     
@@ -754,7 +817,6 @@ async function updateStatus(request) {
         );         
         break;
       default:
-        console.log("Invalid Action")
         return "Invalid Action"
     }
     return true;
