@@ -1,7 +1,8 @@
 const Word = require('../models/word.model');
 const User = require('../models/user.model');
+const UserType = require('../models/userType.model');
 const mongoose = require ('mongoose');
-const { off } = require('../models/word.model');
+const { type } = require('express/lib/response');
 
 
 // Función de consulta de todos los Words y filtrado por palabra
@@ -377,6 +378,129 @@ async function setNewItem (request) {
 };
 
 
+// Función para obtener un item especifico 
+async function getDetail(request) {
+  
+  const { idWord, idComplement, idTranslate } = request;
+
+  const word = await Word.findById(idWord);
+
+  const data = detailWord(word, idComplement, idTranslate);
+
+  return data;
+}
+
+
+function detailWord(word, idComplement, idTranslate) {
+
+  let data = {}
+
+  if(idComplement){
+    if(idTranslate){
+      const complement = word.complements.filter((complement) => {
+        return complement._id == idComplement;
+      });
+
+      let translation;
+
+      complement.filter(({translations}) => {
+        translation = translations.filter((translation) => {
+          return translation._id == idTranslate;
+        })
+      });
+
+      data = {
+        _id: complement[0]._id,
+        word: word.word,
+        userId: complement[0].userId,
+        userName: complement[0].userName,
+        imgUser: complement[0].imgUser,
+        meaning: complement[0].meaning,
+        example: complement[0].example,
+        urlImage: complement[0].urlImage,
+        language: complement[0].language,
+        country: complement[0].country,
+        state: complement[0].state,
+        topic: complement[0].topic,
+        likes: complement[0].likes,
+        createdAt: complement[0].createdAt,
+        translations: translation[0]
+      }
+      
+    }
+    else{
+      const complement = word.complements.filter((complement) => {
+        return complement._id == idComplement;
+      })
+
+      data = {
+        _id: complement[0]._id,
+        word: word.word,
+        userId: complement[0].userId,
+        userName: complement[0].userName,
+        imgUser: complement[0].imgUser,
+        meaning: complement[0].meaning,
+        example: complement[0].example,
+        urlImage: complement[0].urlImage,
+        language: complement[0].language,
+        country: complement[0].country,
+        state: complement[0].state,
+        topic: complement[0].topic,
+        likes: complement[0].likes,
+        createdAt: complement[0].createdAt,
+
+      }
+    }
+  }
+  else{
+    if(idTranslate){
+      const translate = word.translations.filter((translate) => {
+        return translate._id == idTranslate;
+      })
+
+      data = {
+        _id: word._id,
+        word: word.word,
+        userId: word.userId,
+        userName: word.userName,
+        imgUser: word.imgUser,
+        meaning: word.meaning,
+        example: word.example,
+        urlImage: word.urlImage,
+        language: word.language,
+        country: word.country,
+        state: word.state,
+        topic: word.topic,
+        likes: word.likes,
+        createdAt: word.createdAt,
+        translations: translate[0]
+      }
+    }
+    else{
+      data = {
+        _id: word._id,
+        word: word.word,
+        userId: word.userId,
+        userName: word.userName,
+        imgUser: word.imgUser,
+        meaning: word.meaning,
+        example: word.example,
+        urlImage: word.urlImage,
+        language: word.language,
+        country: word.country,
+        state: word.state,
+        topic: word.topic,
+        likes: word.likes,
+        createdAt: word.createdAt
+      }
+    }
+  }
+
+  return data;
+
+}
+
+
 // Función de actualización del estatus del documento
 async function updateStatus(request) {
 
@@ -440,24 +564,50 @@ async function updateStatus(request) {
           }
         }
         else{
-          await Word.findOneAndUpdate(
-            {
-              _id: id,
-            },
-            {
-              // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-              $set: {
-                userValidator : nameValidator, 
-                reason : reason,
-                status : status,
+          if(idTranslate !== ""){
+            await Word.findOneAndUpdate(
+              {
+                _id: id,
+              },
+              {
+                // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+                $set: {
+                  "translations.$[tra].userValidator" : nameValidator, 
+                  "translations.$[tra].reason" : reason,
+                  "translations.$[tra].status" : status
+                }
+              },
+              { 
+                arrayFilters: [
+                  // Se requiere un filtro adicional para identificar el complemento a modificar
+                  {"tra._id": idTranslate}
+                ],     
+                new: true,
+                useFindAndModify: true,
+                returnNewDocument: true,
               }
-            },
-            {     
-              new: true,
-              useFindAndModify: true,
-              returnNewDocument: true,
-            }
-          );
+            );
+          }
+          else{
+            await Word.findOneAndUpdate(
+              {
+                _id: id,
+              },
+              {
+                // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+                $set: {
+                  userValidator : nameValidator, 
+                  reason : reason,
+                  status : status,
+                }
+              },
+              {     
+                new: true,
+                useFindAndModify: true,
+                returnNewDocument: true,
+              }
+            );
+          }
         }
         // Se incrementa en 1 el campo de registros validados y de los puntos de usuario y a la vez se decrementa en 1 el campo de registros en validación
         await User.findOneAndUpdate(
@@ -471,7 +621,21 @@ async function updateStatus(request) {
               points: 1
             }
           }
-        );            
+        );
+        const user = await User.findById(userId);
+        const userType = await UserType.findOne({userType: "Moderador"});
+
+        if(user.userType !== userType.userType && user.points >= userType.pointsToBe){
+          await User.findOneAndUpdate(
+            {
+              _id: userId,
+            },
+            {
+              $set: {userType: userType.userType}
+            }
+          )
+        }
+        
         break;
       case 3:
         if(idComplement !== ""){
@@ -526,24 +690,50 @@ async function updateStatus(request) {
           }
         }
         else{
-          await Word.findOneAndUpdate(
-            {
-              _id: id,
-            },
-            {
-              // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
-              $set: {
-                userValidator : nameValidator, 
-                reason : reason,
-                status : status,
+          if(idTranslate !== ""){
+            await Word.findOneAndUpdate(
+              {
+                _id: id,
+              },
+              {
+                // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+                $set: {
+                  "translations.$[tra].userValidator" : nameValidator, 
+                  "translations.$[tra].reason" : reason,
+                  "translations.$[tra].status" : status
+                }
+              },
+              { 
+                arrayFilters: [
+                  // Se requiere un filtro adicional para identificar el complemento a modificar
+                  {"tra._id": idTranslate}
+                ],     
+                new: true,
+                useFindAndModify: true,
+                returnNewDocument: true,
               }
-            },
-            {     
-              new: true,
-              useFindAndModify: true,
-              returnNewDocument: true,
-            }
-          );
+            );
+          }
+          else{
+            await Word.findOneAndUpdate(
+              {
+                _id: id,
+              },
+              {
+                // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+                $set: {
+                  userValidator : nameValidator, 
+                  reason : reason,
+                  status : status,
+                }
+              },
+              {     
+                new: true,
+                useFindAndModify: true,
+                returnNewDocument: true,
+              }
+            );
+          }
         }
         // Se decrementa en 1 el campo de registros en validación y se incrementa en 1 el de canceladoss
         await User.findOneAndUpdate(
@@ -581,6 +771,7 @@ module.exports = {
     getWordsById,
     setWord,
     setNewItem,
+    getDetail,
     updateStatus,
     deleteWord
 };
