@@ -10,7 +10,6 @@ async function validateToken(request, response) {
         if(token) {
             jwt.verify(token, process.env.API_KEY, (error, decoded) => {
                 if(error){
-                    console.log(error)
                     response.statusCode = 403;
                     return response.json({ success: false, message:  'Token inválida'});
                 }else {

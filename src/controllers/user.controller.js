@@ -89,11 +89,7 @@ async function getLogin(request, response) {
     try {
         const {email, password} = request.body;
 
-        console.log(request.body)
-
         const token = await User.getLogin({email, password});
-
-        console.log(token)
 
         if(token.error === 401){
             response.statusCode = 401;
