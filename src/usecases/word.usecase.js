@@ -2,7 +2,6 @@ const Word = require('../models/word.model');
 const User = require('../models/user.model');
 const UserType = require('../models/userType.model');
 const mongoose = require ('mongoose');
-const { type } = require('express/lib/response');
 
 
 // Función de consulta de todos los Words y filtrado por palabra
@@ -325,6 +324,7 @@ async function setWord(request) {
     session.endSession();
   }
 }
+
 
 // Función de eliminación de word por ID
 async function deleteWord(request) {
