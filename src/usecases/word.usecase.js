@@ -3,7 +3,6 @@ const User = require('../models/user.model');
 const UserType = require('../models/userType.model');
 const mongoose = require ('mongoose');
 
-
 // Función de consulta de todos los Words y filtrado por palabra
 async function getWords(action, userName) {
 
@@ -252,7 +251,9 @@ function getCompTranslations(cTra) {
 
 async function getWordsByFilters(filters) {
 
-  const words = await Word.find(filters);
+  const words = await Word.find(filters)
+                          .where({"status": 2})
+                          .sort({"createdAt": -1});
 
   return words;
 }
