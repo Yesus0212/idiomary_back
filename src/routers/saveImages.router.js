@@ -4,6 +4,6 @@ const routeProtected = require('../middlewares/routeProtected')
 
 const router = express.Router()
 
-router.post('/upload', routeProtected, saveImageController.upload);
+router.post('/upload', saveImageController.upload);
 
 module.exports = router;
