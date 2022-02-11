@@ -1,6 +1,5 @@
 const Word = require('../usecases/word.usecase');
 
-
 // Obtiene la información 
 async function getWord(request, response) {
     try {
@@ -53,7 +52,6 @@ async function setWord(request, response) {
     try {
         const newWord = request.body;
         const createWord = await Word.setWord(newWord);
-
 
         if(!createWord){
             response.statusCode = 412;

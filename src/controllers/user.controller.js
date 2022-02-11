@@ -51,6 +51,7 @@ async function getUserById(request, response) {
 async function setUser(request, response) {
     try {
         const newUser = request.body;
+
         const result = await User.setUser(newUser);
 
         response.statusCode = 201;

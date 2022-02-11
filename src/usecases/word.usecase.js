@@ -326,6 +326,7 @@ async function setWord(request) {
   }
 }
 
+
 // Función de eliminación de word por ID
 async function deleteWord(request) {
     const id = request;         
