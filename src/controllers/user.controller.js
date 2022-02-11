@@ -1,5 +1,4 @@
 const User = require('../usecases/user.usecase');
-const S3 = require('../Utils/s3saveImage');
 
 async function getUser(request, response) {
     try {
@@ -51,11 +50,9 @@ async function getUserById(request, response) {
 
 async function setUser(request, response) {
     try {
-        const {userName, email, password, language, country, state, fileImage, userType, points, filters} = request.body;
+        const newUser = request.body;
 
-        const urlImage = await S3.saveImage(fileImage);
-
-        const result = await User.setUser({userName, email, password, language, country, state, urlImage, userType, points, filters});
+        const result = await User.setUser(newUser);
 
         response.statusCode = 201;
         response.json({

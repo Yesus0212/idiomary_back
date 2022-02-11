@@ -1,5 +1,4 @@
 const Word = require('../usecases/word.usecase');
-const S3 = require('../Utils/s3saveImage');
 
 // Obtiene la información 
 async function getWord(request, response) {
@@ -51,14 +50,8 @@ async function getWordById(request, response) {
 
 async function setWord(request, response) {
     try {
-        // Ajuste el nombre a fileImage para obtener el archivo a guardar en S3
-        const {word, type, userId, imgUser, userName, meaning, example, fileImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = request.body;
-
-        // En esta función, voy a guardar la imagen y a obtener el nombre que se guardará en la BD
-        const urlImage = await S3.saveImage(fileImage);
-
-        const createWord = await Word.setWord({word, type, userId, imgUser, userName, meaning, example, urlImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements});
-
+        const newWord = request.body;
+        const createWord = await Word.setWord(newWord);
 
         if(!createWord){
             response.statusCode = 412;
