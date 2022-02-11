@@ -20,8 +20,6 @@ async function upload(request, response){
         const form = formidable({ multiples: true });
     
         form.parse(request, (err, fields, files) => {  
-
-            console.log(Object.keys(files).length === 0)
             
             if(!(Object.keys(files).length === 0)){
                 
@@ -37,12 +35,15 @@ async function upload(request, response){
                 const uploadParams = {
                     Bucket: process.env.S3_BUCKET,
                     Key: id,
-                    Body: fs.createReadStream(files.image.filepath)
+                    ACL: 'public-read',
+                    Body: fs.createReadStream(files.image.filepath),
+                    ContentType: files.image.mimetype,
+                    ContentLength: files.image.size,
                 }
           
                 S3.upload(uploadParams, (err, data) => {
                     if(err) {
-                        // response.statusCode
+                        response.statusCode = 500;
                         response.json({
                             success: false,
                             err
