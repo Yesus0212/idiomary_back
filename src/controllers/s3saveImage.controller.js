@@ -21,7 +21,7 @@ async function upload(request, response){
     
         form.parse(request, (err, fields, files) => {  
             
-            if(!(Object.keys(files).length === 0)){
+            if(!(Object.keys(files).length === 0) && (Object.keys(files) == "files")){
                 
                 if (err) {                      
                     response.statusCode = 404;
