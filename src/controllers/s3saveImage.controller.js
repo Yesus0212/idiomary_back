@@ -25,7 +25,7 @@ async function upload(request, response){
                 
                 if (err) {                      
                     response.statusCode = 404;
-                    response.json({
+                    response.json({ 
                         success: false,
                         err
                     })
@@ -36,9 +36,9 @@ async function upload(request, response){
                     Bucket: process.env.S3_BUCKET,
                     Key: id,
                     ACL: 'public-read',
-                    Body: fs.createReadStream(files.image.filepath),
-                    ContentType: files.image.mimetype,
-                    ContentLength: files.image.size,
+                    Body: fs.createReadStream(files.files.filepath),
+                    ContentType: files.files.mimetype,
+                    ContentLength: files.files.size,
                 }
           
                 S3.upload(uploadParams, (err, data) => {
