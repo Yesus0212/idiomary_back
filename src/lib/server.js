@@ -9,7 +9,6 @@ const reason = require('../routers/reasons.router');
 const userType = require('../routers/userTypes.router');
 const language = require('../routers/languages.router');
 const token = require('../routers/tokens.router');
-const image = require('../routers/saveImages.router');
 
 const logger = require('../middlewares/logger')
 
@@ -33,7 +32,6 @@ server.use('/reasons', reason);
 server.use('/userTypes', userType);
 server.use('/languages', language);
 server.use('/validateToken', token);
-server.use('/image', image);
 
 
 module.exports = server;

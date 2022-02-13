@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const formidable = require("formidable"); // Librería para el manejo de las imagenes
 const { v4: uuidv4 } = require("uuid"); // Librería para generar identificadores unicos
 
-async function upload(request, response){
+async function upload(request){
 
     try {
         
@@ -24,11 +24,8 @@ async function upload(request, response){
             if(!(Object.keys(files).length === 0) && (Object.keys(files) == "files")){
                 
                 if (err) {                      
-                    response.statusCode = 404;
-                    response.json({ 
-                        success: false,
-                        err
-                    })
+                    console.log(err)
+                    return null;                    
                 }
         
                 const id = uuidv4();
@@ -43,41 +40,25 @@ async function upload(request, response){
           
                 S3.upload(uploadParams, (err, data) => {
                     if(err) {
-                        response.statusCode = 500;
-                        response.json({
-                            success: false,
-                            err
-                        });
+                        console.log(err)
+                        return null; 
                     }
                     if(data) {
-                        response.statusCode = 200;
-                        response.json({
-                            success: true,
-                            urlImage: data.Location,
-                        });
+                        console.log(err)
+                        return data.Location
                     }
                 });            
 
-            }else{
-                response.statusCode = 400;
-                response.json({
-                    success: false,
-                    message: "Missing file"
-                })
-
+            }else{                
+                return null; 
             }
 
     
         });
         
     } catch (error) {
-
-        response.statusCode = 500;
-        response.json({
-            success: false,
-            error
-        })
-        
+        console.log(error)
+        return null; 
     }
 
     

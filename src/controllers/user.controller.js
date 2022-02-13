@@ -1,4 +1,5 @@
 const User = require('../usecases/user.usecase');
+const Image = require('./s3saveImage.controller');
 
 async function getUser(request, response) {
     try {
@@ -147,8 +148,10 @@ async function updateUser(request, response) {
         const id = request.params.id;
         const { language, country, state, urlImage, filters } = request.body;
 
+        const url = Image.upload(urlImage);
+
         // Se utiliza para actualizar la información de un usuario
-        const update = await User.setNewData({id, language, country, state, urlImage, filters});
+        const update = await User.setNewData({id, language, country, state, url, filters});
 
         response.statusCode = 200;
         response.json({
