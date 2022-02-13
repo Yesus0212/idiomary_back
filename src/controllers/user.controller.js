@@ -52,35 +52,35 @@ async function setUser(request, response) {
     try {
         const newUser = request.body;
 
-        const result = await User.setUser(newUser);
+        const token = await User.setUser(newUser);
 
         response.statusCode = 201;
         response.json({
             success: true,
-            result
+            token
         })
 
         
     }
     catch(error) {        
-        let result;
+        let token;
 
         if(error.code === 11000){
             response.statusCode = 412;
-            result = {
+            token = {
                 "error": "11000",
                 "value": "Correo o usuario duplicados"
             }
         }
         else{
             response.statusCode = 400;
-            result = error;
+            token = error;
         }
 
         response.json({
             success: false,
             message: 'Could not set new User',
-            result
+            token
         });
     }
 };
