@@ -20,6 +20,8 @@ async function upload(request){
         const form = formidable({ multiples: true });
     
         form.parse(request, (err, fields, files) => {  
+
+            // Los fields, contienen todo lo que no sea una imagen
             
             if(!(Object.keys(files).length === 0) && (Object.keys(files) == "files")){
                 
@@ -37,6 +39,8 @@ async function upload(request){
                     ContentType: files.files.mimetype,
                     ContentLength: files.files.size,
                 }
+
+                response.json({success: true})
           
                 S3.upload(uploadParams, (err, data) => {
                     if(err) {
@@ -44,7 +48,6 @@ async function upload(request){
                         return null; 
                     }
                     if(data) {
-                        console.log(err)
                         return data.Location
                     }
                 });            
@@ -60,7 +63,6 @@ async function upload(request){
         console.log(error)
         return null; 
     }
-
     
 }
 
