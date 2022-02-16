@@ -22,8 +22,8 @@ server.options('*', cors());
 
 server.use(logger);
 
-// Se agrega un limite en la recepción de hasta 5 megabytes por mensaje recibido
-server.use(express.urlencoded({ limit: "1mb" }));
+// Revisar, porque esto no sirve de nada
+// server.use(express.urlencoded({ limit: "1kb" }));
 server.use(bodyParser.urlencoded({ extended: true }));
 
 server.use('/words', word);

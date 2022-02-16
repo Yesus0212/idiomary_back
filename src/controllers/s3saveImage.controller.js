@@ -4,7 +4,11 @@ const AWS = require('aws-sdk');
 const formidable = require("formidable"); // Librería para el manejo de las imagenes
 const { v4: uuidv4 } = require("uuid"); // Librería para generar identificadores unicos
 
-async function upload(request){
+async function upload(id, request){
+
+    const data = {}
+
+    data.id = id;
 
     try {
         
@@ -20,14 +24,12 @@ async function upload(request){
         const form = formidable({ multiples: true });
     
         form.parse(request, (err, fields, files) => {  
-
-            // Los fields, contienen todo lo que no sea una imagen
             
-            if(!(Object.keys(files).length === 0) && (Object.keys(files) == "files")){
+            if(!(Object.keys(files).length === 0) && (Object.keys(files).includes("urlImage"))){
                 
                 if (err) {                      
                     console.log(err)
-                    return null;                    
+                    return null;
                 }
         
                 const id = uuidv4();
@@ -35,27 +37,34 @@ async function upload(request){
                     Bucket: process.env.S3_BUCKET,
                     Key: id,
                     ACL: 'public-read',
-                    Body: fs.createReadStream(files.files.filepath),
-                    ContentType: files.files.mimetype,
-                    ContentLength: files.files.size,
+                    Body: fs.createReadStream(files.urlImage.filepath),
+                    ContentType: files.urlImage.mimetype,
+                    ContentLength: files.urlImage.size,
                 }
-
-                response.json({success: true})
           
                 S3.upload(uploadParams, (err, data) => {
                     if(err) {
                         console.log(err)
-                        return null; 
+                        return null;
                     }
                     if(data) {
-                        return data.Location
+                        data.urlImage = data.Location;
                     }
                 });            
 
-            }else{                
-                return null; 
+            }   
+            
+            if(!(Object.keys(files).length === 0) && (Object.keys(files).includes("filters"))){
+                data.filters = files.filters;
+            }
+            
+            if(!(Object.keys(fields).length === 0)){
+                if(Object.keys(fields).includes("language")) data.language = fields.language;
+                if(Object.keys(fields).includes("country")) data.country = fields.country;
+                if(Object.keys(fields).includes("state")) data.state = fields.state;
             }
 
+            return data;
     
         });
         
