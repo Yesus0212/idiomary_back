@@ -1,5 +1,5 @@
 const User = require('../usecases/user.usecase');
-const Image = require('./s3saveImage.controller');
+require('dotenv').config();
 
 async function getUser(request, response) {
     try {
@@ -146,12 +146,9 @@ async function deleteUser(request, response) {
 async function updateUser(request, response) {
     try {
         const id = request.params.id;
-        const { language, country, state, urlImage, filters } = request.body;
+        const {language, country, state, urlImage, filters} = request.body;
 
-        const url = Image.upload(urlImage);
-
-        // Se utiliza para actualizar la información de un usuario
-        const update = await User.setNewData({id, language, country, state, url, filters});
+        const update = await User.setNewData({id, language, country, state, urlImage, filters});        
 
         response.statusCode = 200;
         response.json({
@@ -164,11 +161,13 @@ async function updateUser(request, response) {
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not insert a new Item a Word',
+            message: 'Could not update user data',
             error
         });
     }
 }
+
+
 
 
 module.exports = {
