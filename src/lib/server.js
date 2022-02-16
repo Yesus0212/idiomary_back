@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const formData = require("express-form-data");
+const os = require("os");
 
 const word = require('../routers/words.router');
 const user = require('../routers/users.router');
@@ -21,6 +23,20 @@ server.use(cors());
 server.options('*', cors());
 
 server.use(logger);
+
+const options = {
+    uploadDir: os.tmpdir(),
+    autoClean: true
+};
+
+// parse data with connect-multiparty. 
+server.use(formData.parse(options));
+// delete from the request all empty files (size == 0)
+// server.use(formData.format());
+// change the file objects to fs.ReadStream 
+// server.use(formData.stream());
+// union the body and the files
+server.use(formData.union());
 
 // Revisar, porque esto no sirve de nada
 // server.use(express.urlencoded({ limit: "1kb" }));

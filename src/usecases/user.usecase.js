@@ -1,6 +1,11 @@
 const User = require('../models/user.model');
+const Word = require('../models/word.model');
+const mongoose = require ('mongoose');
 const jwt = require('jsonwebtoken');
 const mailUser = require('../templates/userRegister');
+const Image = require('../controllers/s3saveImage.controller');
+
+
 require('dotenv').config();
 
 // Para el manejo de la los datos para la actualización en el perfil
@@ -106,87 +111,75 @@ else {
 // Función para actualizar la información de un usuario 
 async function setNewData(request) {
 
-  const {id, language, country, state, urlImage, filters} = request;   
+  const {id, language, country, state, urlImage, filters} = request;
 
-  const updateUser = await User.findOneAndUpdate(
-    {
-      _id: id,
-    },
-    {
-      $set: {
-        language,
-        country,
-        state,
-        urlImage,
-        filters
+  let newFilters = undefined;
+
+  if(filters){
+    newFilters = JSON.parse(filters);
+  }  
+
+  const url = await Image.upload(urlImage);
+
+  const session = await mongoose.startSession()
+  session.startTransaction()
+
+  try{
+    const update = await User.findOneAndUpdate(
+      {
+        _id: id,
       },
-    },
-    {     
-      new: true,
-      useFindAndModify: true,
-      returnNewDocument: true,
-    }
-  );  
-  
-  return updateUser;   
+      {
+        $set: {
+          language,
+          country,
+          state,
+          urlImage: url,
+          filters: newFilters
+        },
+      },
+      {     
+        new: true,
+        useFindAndModify: true,
+        returnNewDocument: true,
+      }
+    );
+
+    await Word.updateMany(
+      {
+        userId: id,        
+      },
+      {
+        $set: {
+          imgUser: url
+        }
+      }
+    );
+
+    await Word.updateMany(
+      {
+        "complements.userId": id,        
+      },
+      {
+        $set: {
+          "complements.imgUser": url
+        }
+      }
+    );
+
+    return update;
+  }
+  catch(error){
+    console.log(error);
+    // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
+    await session.abortTransaction()  
+   return false
+  } finally {
+    // Finaliza la session
+    session.endSession()
+  }  
 }
 
-
-async function getNewImage(request) {
-
-  try {
-        
-    // Creamos la constante de S3, con toda la información para la conexión
-    const S3 = new AWS.S3({
-        signatureVersion: "v4",
-        apiVersion: "2006-03-01",
-        accessKeyId: process.env.S3_USER,
-        secretAccessKey: process.env.S3_PASS,
-        region: process.env.REGION,
-    });
-
-    const form = formidable({ multiples: true });
-
-    form.parse(request, (err, fields, files) => {  
-        
-        if(!(Object.keys(files).length === 0) && (Object.keys(files).includes("urlImage"))){
-            
-            if (err) {                      
-                console.log(err)
-                return null;
-            }
-    
-            const id = uuidv4();
-            const uploadParams = {
-                Bucket: process.env.S3_BUCKET,
-                Key: id,
-                ACL: 'public-read',
-                Body: fs.createReadStream(files.urlImage.filepath),
-                ContentType: files.urlImage.mimetype,
-                ContentLength: files.urlImage.size,
-            }
-      
-            S3.upload(uploadParams, (err, data) => {
-                if(err) {
-                    console.log(err)
-                    return null;
-                }
-                if(data) {
-                    return data.Location;
-                }
-            });            
-
-        }   
-    });
-    
-} catch (error) {
-    console.log(error)
-    return null; 
-}
-
-
-}
-  
 
 // Función de eliminación de user por ID
 async function deleteUser(request) {
@@ -202,6 +195,5 @@ module.exports = {
     setUser,
     getLogin,
     setNewData,
-    getNewImage,
     deleteUser
 };

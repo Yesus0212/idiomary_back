@@ -1,10 +1,5 @@
 const User = require('../usecases/user.usecase');
-const Image = require('./s3saveImage.controller');
 require('dotenv').config();
-const fs = require('fs');
-const AWS = require('aws-sdk');
-const formidable = require("formidable"); // Librería para el manejo de las imagenes
-const { v4: uuidv4 } = require("uuid"); // Librería para generar identificadores unicos
 
 async function getUser(request, response) {
     try {
@@ -151,21 +146,10 @@ async function deleteUser(request, response) {
 async function updateUser(request, response) {
     try {
         const id = request.params.id;
+        const {language, country, state, urlImage, filters} = request.body;
 
-        const urlImage = await User.getNewImage(request);
-        // const filters = await User.getFilters(request);
-        // const data = await User.getData(request);
+        const update = await User.setNewData({id, language, country, state, urlImage, filters});        
 
-        let update;
-        if(urlImage){
-            const data = {}
-            data.id = id
-            data.urlImage = urlImage;
-            update = await User.setNewData(data);
-        }
-
-        
-        
         response.statusCode = 200;
         response.json({
             success: true,
@@ -177,7 +161,7 @@ async function updateUser(request, response) {
         response.statusCode = 500;
         response.json({
             success: false,
-            message: 'Could not insert a new Item a Word',
+            message: 'Could not update user data',
             error
         });
     }
