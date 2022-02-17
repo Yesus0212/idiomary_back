@@ -146,9 +146,9 @@ async function deleteUser(request, response) {
 async function updateUser(request, response) {
     try {
         const id = request.params.id;
-        const {language, country, region, urlImage, filters} = request.body;
+        const {language, country, state, urlImage, filters} = request.body;
 
-        const update = await User.setNewData({id, language, country, region, urlImage, filters});        
+        const update = await User.setNewData({id, language, country, state, urlImage, filters});        
 
         if(update !== null){
             response.statusCode = 200;

@@ -111,13 +111,13 @@ else {
 // Función para actualizar la información de un usuario 
 async function setNewData(request) {
 
-  const {id, language, country, region, urlImage, filters} = request;
+  const {id, language, country, state, urlImage, filters} = request;
 
   let newLanguage, newCountry, newState, url, newFilters = undefined;
 
   if(language != "") newLanguage = language
   if(country != "") newCountry = country
-  if(region != "") newState = region
+  if(state != "") newState = state
   if(filters) newFilters = JSON.parse(filters);  
 
   if(typeof(urlImage) === "Object") url = await Image.upload(urlImage);
