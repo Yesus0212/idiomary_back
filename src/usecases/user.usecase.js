@@ -111,15 +111,18 @@ else {
 // Función para actualizar la información de un usuario 
 async function setNewData(request) {
 
-  const {id, language, country, state, urlImage, filters} = request;
+  const {id, language, country, region, urlImage, filters} = request;
 
-  let newFilters = undefined;
+  let newLanguage, newCountry, newState, url, newFilters = undefined;
 
-  if(filters){
-    newFilters = JSON.parse(filters);
-  }  
+  if(language != "") newLanguage = language
+  if(country != "") newCountry = country
+  if(region != "") newState = region
+  if(filters) newFilters = JSON.parse(filters);  
 
-  const url = await Image.upload(urlImage);
+  if(typeof(urlImage) === "Object") url = await Image.upload(urlImage);
+
+  console.log(url);
 
   const session = await mongoose.startSession()
   session.startTransaction()
@@ -131,9 +134,9 @@ async function setNewData(request) {
       },
       {
         $set: {
-          language,
-          country,
-          state,
+          language: newLanguage,
+          country: newCountry,
+          state: newState,
           urlImage: url,
           filters: newFilters
         },
