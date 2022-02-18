@@ -120,9 +120,7 @@ async function setNewData(request) {
   if(state != "") newState = state
   if(filters) newFilters = JSON.parse(filters);  
 
-  if(typeof(urlImage) === "Object") url = await Image.upload(urlImage);
-
-  console.log(url);
+  if(urlImage.path !== undefined) url = await Image.upload(urlImage);
 
   const session = await mongoose.startSession()
   session.startTransaction()

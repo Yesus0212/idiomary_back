@@ -50,8 +50,8 @@ async function getWordById(request, response) {
 
 async function setWord(request, response) {
     try {
-        const newWord = request.body;
-        const createWord = await Word.setWord(newWord);
+        const {data, urlImage} = request.body;
+        const createWord = await Word.setWord({data, urlImage});
 
         if(!createWord){
             response.statusCode = 412;
@@ -107,10 +107,10 @@ async function deleteWord(request, response) {
 async function setNewItemWord(request, response) {
     try {
         const id = request.params.id;
-        const { action, idComplement, newArray} = request.body;
+        const {urlImage, data}= request.body;
 
         // Se utiliza para agregar un nuevo elemento a de traducción o complemento a la palabra
-        const newItem = await Word.setNewItem({id, action, idComplement, newArray});
+        const newItem = await Word.setNewItem({id, urlImage, data});
 
         if(!newItem){
             response.statusCode = 412;

@@ -19,7 +19,7 @@ async function upload(request){
             region: process.env.REGION,
         });
     
-        if(!(Object.keys(urlImage).length === 0)){
+        if(urlImage.path !== undefined){
             
             const id = uuidv4();
             const uploadParams = {

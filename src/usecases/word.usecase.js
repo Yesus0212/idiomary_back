@@ -1,6 +1,7 @@
 const Word = require('../models/word.model');
 const User = require('../models/user.model');
 const UserType = require('../models/userType.model');
+const Image = require('../controllers/s3saveImage.controller');
 const mongoose = require ('mongoose');
 
 // Función de consulta de todos los Words y filtrado por palabra
@@ -269,8 +270,14 @@ async function getWordsById(request) {
 
 // Función de inserción de word nuevo
 async function setWord(request) {
-  const {word, type, userId, imgUser, userName, meaning, example, urlImage, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = request;    
+  const {data, urlImage} = request;
+
+  const newData = JSON.parse(data);
+  const {word, type, userId, imgUser, userName, meaning, example, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = newData;    
   
+  
+  if(urlImage.path !== undefined) url = await Image.upload(urlImage);
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -283,7 +290,7 @@ async function setWord(request) {
       imgUser,
       meaning,      
       example,
-      urlImage,
+      urlImage: url,
       language,
       country,
       state,
@@ -337,9 +344,13 @@ async function deleteWord(request) {
 // Esta función, permite agregar una traducción, complemento nuevo a una palabra dada o agregar una nueva traducción a un complemento dado
 async function setNewItem (request) {
 
-  const {id, action, idComplement, newArray} = request;
-  const {userId, translations} = newArray;          
+  const {id, data, urlImage} = request;
 
+  const newData = JSON.parse(data);
+
+  const {action, idComplement, newArray} = newData;
+  const {userId, translations} = newArray;
+  
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -395,12 +406,18 @@ async function setNewItem (request) {
         );
         break;
       case "complement":
+        let url;
+  
+        if(urlImage.path !== undefined) url = await Image.upload(urlImage);
+
+        newArray.urlImage = url;
+
         await Word.findOneAndUpdate(
           {
             _id: id,
           },
           {
-            // Se requiere agregar un identificador del complemento, para que este pueda insertar el nuevo elemento al arreglo de traducciones
+            
             $push: {complements : newArray},
           },
           {               
@@ -409,7 +426,7 @@ async function setNewItem (request) {
             returnNewDocument: true,
           }
         );   
-        
+      
         let validation = 1;
         if(translations !== "" && translations !== undefined ){
           validation = 2;
@@ -425,7 +442,8 @@ async function setNewItem (request) {
               inValidation: validation
             }
           }
-        );         
+        ); 
+        
         break;    
       default:
         return "Invalid Action"
@@ -435,6 +453,7 @@ async function setNewItem (request) {
   }
   catch(error){
     // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
+    console.log(error);
     await session.abortTransaction();
     return false;
   } finally {
