@@ -5,42 +5,86 @@ const Image = require('../controllers/s3saveImage.controller');
 const mongoose = require ('mongoose');
 
 // Función de consulta de todos los Words y filtrado por palabra
-async function getWords(action, userName) {
+async function getWords(action, userName, page) {
+
+  const myCustomLabels = {
+    docs: 'words',
+    page: 'currentPage',
+    limit: 'limitPerPage',
+  };
 
   if(action !== "" && action !== undefined && action === "pendings" && (userName !== "" || userName === undefined)){
 
-    const words = await Word.find({})
-                            .where({"status": 1})
-                            .select(["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"])
-                            .sort({"createdAt": -1});
+    const optionsWords = {
+      page,
+      limit: 2,
+      select: ["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"],
+      customLabels: myCustomLabels,
+      sort: {createdAt: -1}
+    }
 
-    const comp = await Word.find({})
-                                  .select(["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"])
-                                  .where({"status": 2})
-                                  .and([{"complements.status": 1}])
-                                  .sort({"complements.createdAt": -1});
+    const optionsComplements = {
+      page,
+      limit: 2,
+      select: ["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"],
+      customLabels: myCustomLabels,
+      sort: {"complements.createdAt": -1}
+    }
 
-    const wTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "language", "country", "state", "translations"])
-                                        .where({"status": 2})
-                                        .and([{"translations.status": 1}]); 
+    const optionsTranslations = {
+      page,
+      limit: 2,
+      select: ["_id", "word", "meaning", "language", "country", "state", "translations"],
+      customLabels: myCustomLabels,
+    }
 
-    const cTranslations = await Word.find({})
-                                        .select(["_id", "word", "meaning", "language", "country", "state", "complements._id", "complements.translations"])
-                                        .where({"status": 2})
-                                        .and([{"complements.status": 2},{"complements.translations.status": 1}]);
+    const optionsCompTranlations = {
+      page,
+      limit: 2,
+      select: ["_id", "word", "meaning", "language", "country", "state", "complements._id", "complements.translations"],
+      customLabels: myCustomLabels,
+    }
 
+    const word = await Word.paginate({status: 1}, optionsWords);
+    // const words = await Word.find({})
+    //                         .where({"status": 1})
+    //                         .select(["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"])
+    //                         .sort({"createdAt": -1});
+
+    const comp = await Word.paginate(({status: 2}, {"complements.status": 1}), optionsComplements);
+
+    // const comp = await Word.find({})
+    //                               .select(["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"])
+    //                               .where({"status": 2})
+    //                               .and([{"complements.status": 1}])
+    //                               .sort({"complements.createdAt": -1});
+
+    const wTranslations = await Word.paginate(({status: 2}, {"translations.status": 1}), optionsTranslations);
+
+    // const wTranslations = await Word.find({})
+    //                                     .select(["_id", "word", "meaning", "language", "country", "state", "translations"])
+    //                                     .where({"status": 2})
+    //                                     .and([{"translations.status": 1}]); 
+
+    const cTranslations = await Word.paginate(({status: 2}, {"complements.status": 2}, {"complements.translations.status": 1}), optionsCompTranlations);
+
+    // const cTranslations = await Word.find({})
+    //                                     .select(["_id", "word", "meaning", "language", "country", "state", "complements._id", "complements.translations"])
+    //                                     .where({"status": 2})
+    //                                     .and([{"complements.status": 2},{"complements.translations.status": 1}]);
+
+    const words = getFilterWords(word);
     const complements = getFilterComplements(comp);
     const wordTranslations = getFilterWordTranslations(wTranslations);
     const compTranslations = getFilterCompTranslations(cTranslations);
                                       
 
-    return pendings = {
-                        words, 
-                        complements, 
-                        wordTranslations, 
-                        compTranslations
-                      };
+    return {
+          words, 
+          complements, 
+          wordTranslations, 
+          compTranslations
+        };
   }
   else if(userName !== "" && userName !== undefined && (action === "" || action === undefined)){
 
@@ -75,9 +119,15 @@ async function getWords(action, userName) {
                         };
   }
   else{
-    const words = await Word.find({})
-                          .where({"status": 2})
-                          .sort({"createdAt": -1});
+    const options = {
+      page,
+      limit: 10,
+      customLabels: myCustomLabels,
+      sort: {createdAt: -1}
+    }
+    const words = await Word.paginate({status: 2}, options);
+                          // .where({"status": 2})
+                          // .sort({"createdAt": -1});    
   
     return words;
   }
@@ -85,9 +135,22 @@ async function getWords(action, userName) {
 }
 
 
+function getFilterWords(word) {
+
+  const final = word.words.map((word) => {
+    return word;
+  });
+  
+  final.currentPage= word.currentPage;
+  final.nextPage= word.nextPage;
+  final.totalPages= word.totalPages;
+
+  return final;
+}
+
 function getFilterComplements(comp) {
 
-  const final = comp.map((complement) => {
+  const final = comp?.words.map((complement) => {
     
     const complements = complement.complements.filter((complement) => {
       return complement.status == 1;
@@ -97,17 +160,21 @@ function getFilterComplements(comp) {
       "_id": complement._id,
       "word": complement.word,
       "status": complement.status,
-      "complements": complements
+      "complements": complements,
     }
 
   })
+
+  final.currentPage= comp.currentPage;
+  final.nextPage= comp.nextPage;
+  final.totalPages= comp.totalPages;
 
   return final;
 }
 
 function getFilterWordTranslations(wTranslations){
 
-  const final = wTranslations.map((translation) => {
+  const final = wTranslations?.words.map((translation) => {
     
     const translations = translation.translations.filter((translate) => {
       return translate.status == 1;
@@ -120,16 +187,20 @@ function getFilterWordTranslations(wTranslations){
       "language": translation.language,
       "country": translation.country,
       "state": translation.state,
-      "translations": translations
+      "translations": translations,
     }
   })
+  
+  final.currentPage= wTranslations.currentPage;
+  final.nextPage= wTranslations.nextPage;
+  final.totalPages= wTranslations.totalPages;
 
   return final;
 }
 
 function getFilterCompTranslations(cTranslations){
   
-  const final = cTranslations.map((complement) => {
+  const final = cTranslations?.words.map((complement) => {
     
     const finalComp = complement.complements.filter((complement) => {
       return complement.translations.length > 0;
@@ -142,9 +213,13 @@ function getFilterCompTranslations(cTranslations){
       "language": complement.language,
       "country": complement.country,
       "state": complement.state,
-      "complements": finalComp        
+      "complements": finalComp,      
     }
   })
+
+  final.currentPage= cTranslations.currentPage;
+  final.nextPage= cTranslations.nextPage;
+  final.totalPages= cTranslations.totalPages;
 
   return final;
 }

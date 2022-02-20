@@ -4,9 +4,11 @@ const Word = require('../usecases/word.usecase');
 async function getWord(request, response) {
     try {
 
-        const {action, userName} = request.query;
+        const {action, userName, page} = request.query;
 
-        const words = await Word.getWords(action, userName);
+        const words = await Word.getWords(action, userName, page);
+
+        console.log(words, "respuesta de las palabras")
         
         response.statusCode = 200;
         response.json({

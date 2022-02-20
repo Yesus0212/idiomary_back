@@ -1,4 +1,7 @@
-const mongoose = require ('mongoose')
+const mongoose = require ('mongoose');
+
+// Para la paginación, agrego la librería de mongoosePaginate
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const translationSchema = new mongoose.Schema(
     {
@@ -195,6 +198,9 @@ const wordSchema = new mongoose.Schema({
     complements:[complementSchema],
 },
 );
+
+//Le agrego la funcionalidad de mongoosePaginate a mi schema
+wordSchema.plugin(mongoosePaginate);
 
 const Word = mongoose.model('word', wordSchema)
 
