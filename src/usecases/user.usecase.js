@@ -118,9 +118,21 @@ async function setNewData(request) {
   if(language != "") newLanguage = language
   if(country != "") newCountry = country
   if(state != "") newState = state
-  if(filters) newFilters = JSON.parse(filters);  
+  if(filters) {
+    newFilters = JSON.parse(filters);  
 
-  if(urlImage.path !== undefined) url = await Image.upload(urlImage);
+    console.log()
+    if(!(typeof(newFilters?.language) == "string"))
+      newFilters.language = ""
+    if(!(typeof(newFilters?.country) == "string"))
+      newFilters.country = ""
+    if(!(typeof(newFilters?.state) == "string"))
+      newFilters.state = ""
+    if(!(typeof(newFilters?.topic) == "string"))
+      newFilters.topic = ""
+  }
+    
+  if(urlImage?.path !== undefined) url = await Image.upload(urlImage);
 
   const session = await mongoose.startSession()
   session.startTransaction()
