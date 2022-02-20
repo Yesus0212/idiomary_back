@@ -148,6 +148,9 @@ async function updateUser(request, response) {
         const id = request.params.id;
         const {language, country, state, urlImage, filters} = request.body;
 
+
+        console.log(request.body);
+
         const update = await User.setNewData({id, language, country, state, urlImage, filters});        
 
         if(update !== null){
