@@ -19,7 +19,7 @@ async function getWord(request, response) {
         response.statusCode = 500;
         response.json({
             sucess: false,
-            message: 'Could not get Tranlations',
+            message: 'Could not get Words',
             error
         });
     }
