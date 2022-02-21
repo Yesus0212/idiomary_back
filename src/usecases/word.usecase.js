@@ -79,12 +79,12 @@ async function getWords(action, userName, page) {
     const compTranslations = getFilterCompTranslations(cTranslations);
                                       
 
-    return {
-          words, 
-          complements, 
-          wordTranslations, 
-          compTranslations
-        };
+    return ({
+      words, 
+      complements,
+      wordTranslations,
+      compTranslations
+    })
   }
   else if(userName !== "" && userName !== undefined && (action === "" || action === undefined)){
 
@@ -121,15 +121,18 @@ async function getWords(action, userName, page) {
   else{
     const options = {
       page,
-      limit: 10,
+      limit: 5,
       customLabels: myCustomLabels,
       sort: {createdAt: -1}
     }
-    const words = await Word.paginate({status: 2}, options);
+    const word = await Word.paginate({status: 2}, options);
                           // .where({"status": 2})
                           // .sort({"createdAt": -1});    
+
+    const words = getFilterWords(word);
   
     return words;
+      
   }
 
 }
@@ -137,12 +140,15 @@ async function getWords(action, userName, page) {
 
 function getFilterWords(word) {
 
-  const final = word.words.map((word) => {
+  const final = {};
+
+  final.words = word.words.map((word) => {
     return word;
   });
   
   final.currentPage= word.currentPage;
   final.nextPage= word.nextPage;
+  final.limitDocsPerPage= word.limitPerPage;
   final.totalPages= word.totalPages;
 
   return final;
@@ -150,7 +156,9 @@ function getFilterWords(word) {
 
 function getFilterComplements(comp) {
 
-  const final = comp?.words.map((complement) => {
+  const final = {};
+
+  final.complements = comp?.words.map((complement) => {
     
     const complements = complement.complements.filter((complement) => {
       return complement.status == 1;
@@ -167,6 +175,7 @@ function getFilterComplements(comp) {
 
   final.currentPage= comp.currentPage;
   final.nextPage= comp.nextPage;
+  final.limitDocsPerPage= comp.limitPerPage;
   final.totalPages= comp.totalPages;
 
   return final;
@@ -174,7 +183,9 @@ function getFilterComplements(comp) {
 
 function getFilterWordTranslations(wTranslations){
 
-  const final = wTranslations?.words.map((translation) => {
+  const final = {};
+
+  final.wordTranslations = wTranslations?.words.map((translation) => {
     
     const translations = translation.translations.filter((translate) => {
       return translate.status == 1;
@@ -193,6 +204,7 @@ function getFilterWordTranslations(wTranslations){
   
   final.currentPage= wTranslations.currentPage;
   final.nextPage= wTranslations.nextPage;
+  final.limitDocsPerPage= wTranslations.limitPerPage;
   final.totalPages= wTranslations.totalPages;
 
   return final;
@@ -200,7 +212,9 @@ function getFilterWordTranslations(wTranslations){
 
 function getFilterCompTranslations(cTranslations){
   
-  const final = cTranslations?.words.map((complement) => {
+  const final = {};
+
+  final.compTranslations = cTranslations?.words.map((complement) => {
     
     const finalComp = complement.complements.filter((complement) => {
       return complement.translations.length > 0;
@@ -219,6 +233,7 @@ function getFilterCompTranslations(cTranslations){
 
   final.currentPage= cTranslations.currentPage;
   final.nextPage= cTranslations.nextPage;
+  final.limitDocsPerPage= cTranslations.limitPerPage;
   final.totalPages= cTranslations.totalPages;
 
   return final;

@@ -11,9 +11,9 @@ async function getWord(request, response) {
         console.log(words, "respuesta de las palabras")
         
         response.statusCode = 200;
-        response.json({
+        response.json(
             words
-        })        
+        )        
     } catch (error) {
         console.error(error);
         response.statusCode = 500;
