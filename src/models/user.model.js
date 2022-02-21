@@ -21,6 +21,7 @@ const filterSchema = new mongoose.Schema(
     }
 );
 
+
 const userSchema = new mongoose.Schema({
     userName: {
         type: String,
@@ -85,6 +86,10 @@ const userSchema = new mongoose.Schema({
         required: false,
     },
     filters: filterSchema,
+    likes: {
+        type: Array,
+        required: false,
+    }
 });
 
 const User = mongoose.model('user', userSchema)

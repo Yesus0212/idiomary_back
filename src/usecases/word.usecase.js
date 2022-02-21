@@ -849,6 +849,85 @@ async function updateStatus(request) {
 };
 
 
+async function setLike(request) {
+  const {id, userId, movement} = request;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try{
+
+    const likesByUser = User.findById({_id: userId})
+                            .select(likes);
+
+    if((likesByUser.includes(id)) && (movement === "like")){
+      return false;
+    }
+    else if(!(likesByUser.includes(id)) && (movement === "dislike")){
+      return false;
+    }
+    else{
+      if(movement === "like"){
+        await Word.findByIdAndUpdate(
+          {
+            _id: id
+          },
+          {
+          $inc: {
+            likes: 1
+          }
+        });
+  
+        await User.findOneAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            $addToSet: {
+              likes: id
+            }
+          }
+        );
+  
+      }
+      else if(movement === "dislike"){
+        await Word.findByIdAndUpdate(
+          {
+            _id: id
+          },
+          {
+          $inc: {
+            likes: -1
+          }
+        })
+  
+        await User.findOneAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            $pull: {
+              likes: id
+            }
+          }
+        );
+      }
+    }
+
+    return true;
+  }
+  catch(error){
+    // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
+    await session.abortTransaction();
+    return false;
+  } finally {
+    // Finaliza la session
+    session.endSession();
+  }
+}
+
+
+
 module.exports = {
     getWords,
     getWordsByFilters,
@@ -857,5 +936,6 @@ module.exports = {
     setNewItem,
     getDetail,
     updateStatus,
-    deleteWord
+    deleteWord,
+    setLike
 };

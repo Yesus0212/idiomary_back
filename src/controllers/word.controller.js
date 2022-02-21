@@ -202,6 +202,42 @@ async function updateStatusWord(request, response) {
 }
 
 
+async function setLikeWord(request, response){
+
+    try {
+        const id = request.params.id;
+        const {userId, movement} = request.body;
+
+        const newLike = await Word.setLike({id, userId, movement});
+
+        if(!newLike){
+            response.statusCode = 412;
+            response.json({
+                success: false
+            });            
+        }
+        else{
+            response.statusCode = 200;
+            response.json({
+                success: true,
+                newLike
+            });
+        }
+
+    }
+    catch(error) {
+        console.error(error);
+        response.statusCode = 500;
+        response.json({
+            success: false,
+            message: 'Could not update word status',
+            error
+        })
+    }
+
+}
+
+
 async function getWordsByFilter(request, response) {
     try {
 
@@ -265,5 +301,6 @@ module.exports = {
     deleteWord,
     setNewItemWord,
     getDetailWord,
-    updateStatusWord
+    updateStatusWord,
+    setLikeWord
 };
