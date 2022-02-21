@@ -32,7 +32,7 @@ async function getUsersById(request) {
 
 // Función de inserción de user nuevo
 async function setUser(request) {
-  const {userName, email, password, language, country, state, urlImage, userType, points, filters} = request;    
+  const {userName, email, password, language, country, state, urlImage, userType, points, filters, likes} = request;    
   const setUser = await User.create({
       userName,
       email,
@@ -43,12 +43,13 @@ async function setUser(request) {
       urlImage,
       userType, 
       points,
-      filters
+      filters,
+      likes
   });
 
   // Se crea el token para enviarlo de regreso
   const token = jwt.sign(
-    { userId: setUser._id, userName, userType, filter: false, filters },
+    { userId: setUser._id, userName, userType, filter: false, filters: setUser.filters, likes: setUser.likes },
     process.env.API_KEY,
     { expiresIn: process.env.TOKEN_EXPIRES},
   );
@@ -58,7 +59,8 @@ async function setUser(request) {
     userName,
     userType,
     filter: false,
-    filters,
+    filters: setUser.filters,
+    likes: setUser.likes,
     token
   };
 }
@@ -84,7 +86,8 @@ if(getUser) {
         userName: getUser.userName, 
         userType: getUser.userType,
         filter,
-        filters: getUser.filters
+        filters: getUser.filters,
+        likes: getUser.likes
       },
       process.env.API_KEY,
       { expiresIn: process.env.TOKEN_EXPIRES},
@@ -95,7 +98,8 @@ if(getUser) {
       userName: getUser.userName,
       userType: getUser.userType,
       filter,
-      userFilter: getUser.filters,
+      filters: getUser.filters,
+      likes: getUser.likes,
       token
     }
   }
@@ -118,9 +122,20 @@ async function setNewData(request) {
   if(language != "") newLanguage = language
   if(country != "") newCountry = country
   if(state != "") newState = state
-  if(filters) newFilters = JSON.parse(filters);  
+  if(filters) {
+    newFilters = JSON.parse(filters);  
 
-  if(urlImage.path !== undefined) url = await Image.upload(urlImage);
+    if(!(typeof(newFilters?.language) == "string"))
+      newFilters.language = ""
+    if(!(typeof(newFilters?.country) == "string"))
+      newFilters.country = ""
+    if(!(typeof(newFilters?.state) == "string"))
+      newFilters.state = ""
+    if(!(typeof(newFilters?.topic) == "string"))
+      newFilters.topic = ""
+  }  
+
+  if(urlImage?.path !== undefined) url = await Image.upload(urlImage);
 
   const session = await mongoose.startSession()
   session.startTransaction()
