@@ -21,6 +21,7 @@ async function validateToken(request, response) {
                     response.send({
                         userId: decoded.userId,
                         userName: user.userName,
+                        urlImage: user.urlImage,
                         userType: user.userType,
                         filter: user.filter,
                         filters: user.filters,
