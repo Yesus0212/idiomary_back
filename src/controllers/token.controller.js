@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user.model');
 require('dotenv').config();
 
 async function validateToken(request, response) {
@@ -8,18 +9,22 @@ async function validateToken(request, response) {
     try{
         
         if(token) {
-            jwt.verify(token, process.env.API_KEY, (error, decoded) => {
+            jwt.verify(token, process.env.API_KEY, async (error, decoded) => {
                 if(error){
                     response.statusCode = 403;
                     return response.json({ success: false, message:  'Token inválida'});
                 }else {
+
+                    const user = await User.getUsersById(decoded.userId);
+
                     response.statusCode = 200;
                     response.send({
                         userId: decoded.userId,
-                        userName: decoded.userName,
-                        userType: decoded.userType,
-                        filter: decoded.filter,
-                        filters: decoded.filters
+                        userName: user.userName,
+                        userType: user.userType,
+                        filter: user.filter,
+                        filters: user.filters,
+                        likes: user.likes
                     })
                 }
             })

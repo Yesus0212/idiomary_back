@@ -43,12 +43,13 @@ async function setUser(request) {
       urlImage,
       userType, 
       points,
-      filters
+      filters, 
+      likes
   });
 
   // Se crea el token para enviarlo de regreso
   const token = jwt.sign(
-    { userId: setUser._id, userName, userType, filter: false, filters },
+    { userId: setUser._id, userName, userType, filter: false, filters, likes },
     process.env.API_KEY,
     { expiresIn: process.env.TOKEN_EXPIRES},
   );
@@ -59,6 +60,7 @@ async function setUser(request) {
     userType,
     filter: false,
     filters,
+    likes,
     token
   };
 }
@@ -84,7 +86,8 @@ if(getUser) {
         userName: getUser.userName, 
         userType: getUser.userType,
         filter,
-        filters: getUser.filters
+        filters: getUser.filters,
+        likes: getUser.likes,
       },
       process.env.API_KEY,
       { expiresIn: process.env.TOKEN_EXPIRES},
@@ -96,6 +99,7 @@ if(getUser) {
       userType: getUser.userType,
       filter,
       userFilter: getUser.filters,
+      likes: getUser.likes,
       token
     }
   }
@@ -115,21 +119,26 @@ async function setNewData(request) {
 
   let newLanguage, newCountry, newState, url, newFilters = undefined;
 
+  const finalFilters = {}; 
+
   if(language != "") newLanguage = language
   if(country != "") newCountry = country
   if(state != "") newState = state
   if(filters) {
     newFilters = JSON.parse(filters);  
 
-    console.log()
-    if(!(typeof(newFilters?.language) == "string"))
-      newFilters.language = ""
-    if(!(typeof(newFilters?.country) == "string"))
-      newFilters.country = ""
-    if(!(typeof(newFilters?.state) == "string"))
-      newFilters.state = ""
-    if(!(typeof(newFilters?.topic) == "string"))
-      newFilters.topic = ""
+    console.log(typeof(filters), typeof(newFilters))
+    
+    if((typeof(newFilters?.language) == "string"))
+      finalFilters.language = newFilters?.language;
+    if((typeof(newFilters?.country) == "string"))
+      finalFilters.country = newFilters?.country
+    if((typeof(newFilters?.state) == "string"))
+      finalFilters.state = newFilters?.state
+    if((typeof(newFilters?.topic) == "string"))
+      finalFilters.topic = newFilters?.topic
+
+    console.log(typeof(finalFilters))
   }
     
   if(urlImage?.path !== undefined) url = await Image.upload(urlImage);
@@ -148,7 +157,7 @@ async function setNewData(request) {
           country: newCountry,
           state: newState,
           urlImage: url,
-          filters: newFilters
+          filters: finalFilters
         },
       },
       {     
