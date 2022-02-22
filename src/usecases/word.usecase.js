@@ -17,7 +17,7 @@ async function getWords(action, userName, page) {
 
     const optionsWords = {
       page,
-      limit: 15,
+      limit: 10,
       select: ["_id", "word", "type", "userId", "userName", "imgUser", "createdAt", "meaning", "example", "urlImage", "language", "country", "state", "topic", "status"],
       customLabels: myCustomLabels,
       sort: {createdAt: -1}
@@ -25,7 +25,7 @@ async function getWords(action, userName, page) {
 
     const optionsComplements = {
       page,
-      limit: 15,
+      limit: 10,
       select: ["_id", "word", "status", "complements._id", "complements.userId", "complements.userName", "complements.imgUser" ,"complements.createdAt", "complements.meaning", "complements.example", "complements.urlImage", "complements.language", "complements.country", "complements.state", "complements.topic", "complements.status"],
       customLabels: myCustomLabels,
       sort: {"complements.createdAt": -1}
@@ -33,14 +33,14 @@ async function getWords(action, userName, page) {
 
     const optionsTranslations = {
       page,
-      limit: 15,
+      limit: 10,
       select: ["_id", "word", "meaning", "language", "country", "state", "translations"],
       customLabels: myCustomLabels,
     }
 
     const optionsCompTranlations = {
       page,
-      limit: 15,
+      limit: 10,
       select: ["_id", "word", "meaning", "language", "country", "state", "complements._id", "complements.translations"],
       customLabels: myCustomLabels,
     }
@@ -121,7 +121,7 @@ async function getWords(action, userName, page) {
   else{
     const options = {
       page,
-      limit: 10,
+      limit: 9,
       customLabels: myCustomLabels,
       sort: {createdAt: -1}
     }
@@ -342,11 +342,25 @@ function getCompTranslations(cTra) {
 
 async function getWordsByFilters(filters) {
 
-  const words = await Word.find(filters)
-                          .where({"status": 2})
-                          .sort({"createdAt": -1});
+  const myCustomLabels = {
+    docs: 'words',
+    page: 'currentPage',
+    limit: 'limitPerPage',
+  };
 
-  return words;
+  const optionsWords = {
+    page: 1,
+    limit: 9,
+    customLabels: myCustomLabels,
+    sort: {createdAt: -1}
+  }
+
+  const words = await Word.paginate(({status: 2}, filters), optionsWords);
+  // const words = await Word.find(filters)
+  //                         .where({"status": 2})
+  //                         .sort({"createdAt": -1});
+
+  return words.words;
 }
 
 

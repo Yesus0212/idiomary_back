@@ -43,12 +43,13 @@ async function setUser(request) {
       urlImage,
       userType, 
       points,
-      filters
+      filters, 
+      likes
   });
 
   // Se crea el token para enviarlo de regreso
   const token = jwt.sign(
-    { userId: setUser._id, userName, userType, filter: false, filters },
+    { userId: setUser._id, userName, userType, filter: false, filters, likes: setUser.likes },
     process.env.API_KEY,
     { expiresIn: process.env.TOKEN_EXPIRES},
   );
@@ -59,6 +60,7 @@ async function setUser(request) {
     userType,
     filter: false,
     filters,
+    likes: setUser.likes,
     token
   };
 }
@@ -84,7 +86,8 @@ if(getUser) {
         userName: getUser.userName, 
         userType: getUser.userType,
         filter,
-        filters: getUser.filters
+        filters: getUser.filters,
+        likes: getUser.likes
       },
       process.env.API_KEY,
       { expiresIn: process.env.TOKEN_EXPIRES},
@@ -96,6 +99,7 @@ if(getUser) {
       userType: getUser.userType,
       filter,
       userFilter: getUser.filters,
+      likes: getUser.likes,
       token
     }
   }
