@@ -8,13 +8,6 @@ const Image = require('../controllers/s3saveImage.controller');
 
 require('dotenv').config();
 
-// Para el manejo de la los datos para la actualización en el perfil
-const fs = require('fs');
-const AWS = require('aws-sdk');
-const formidable = require("formidable"); // Librería para el manejo de las imagenes
-const { v4: uuidv4 } = require("uuid");
-
-
 // Función de consulta de todos los Users y filtrado
 async function getUsers(filters) {
     const users = await User.find(filters);

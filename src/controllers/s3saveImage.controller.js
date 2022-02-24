@@ -1,8 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const AWS = require('aws-sdk');
-const formidable = require("formidable"); // Librería para el manejo de las imagenes
-const { v4: uuidv4 } = require("uuid"); // Librería para generar identificadores unicos
+const { uuid } = require('uuidv4'); // Librería para generar identificadores unicos
 
 async function upload(request){
 
@@ -21,7 +20,7 @@ async function upload(request){
     
         if(urlImage?.path !== undefined){
             
-            const id = uuidv4();
+            const id = uuid();
             const uploadParams = {
                 Bucket: process.env.S3_BUCKET,
                 Key: id,
