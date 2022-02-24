@@ -1,35 +1,31 @@
 'use strict'
 
-const nodemailer = require('nodemailer');
+const sgMail = require('../services/sendgrid');
 require('dotenv').config();
 
 
-function registerMail(userName) {
-
-    console.log(userName, "nombre del usuario")
-    
-    const transport = nodemailer.createTransport({
-        host: process.env.SES_HOST,
-        port: process.env.SES_PORT,
-        auth: {
-          user: process.env.SES_USER,
-          pass: process.env.SES_PASS
-        }
-    });
+async function registerMail(userName, email, testing = false) {
     
     const message = {
-        from: "jesussolispadron@gmail.com",
-        to: "jesussolispadron@gmail.com",
-        subject: "Prueba de envio",
-        html: `<h1>Hello ${userName} Email</h1>`
+        to: email,
+        from: process.env.MAIL_FROM,        
+        subject: "Bienvenido a Idiomary!",
+        text: "Bienvenido a Idiomary",
+        html: `<h1>Hola ${userName}, muchas gracias por unirte a nuestra tripulación!</h1>`,
+        mail_settings: {
+            sandbox_mode: {
+                enable: testing
+            }
+        }
     }
 
-    transport.sendMail(message, (error, info) => {
-        if(error)
-            console.log(error)
-        else
-            console.log(info)
-    })
+    try {
+        await sgMail.send(message);
+        return true;        
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
 }
 
 
