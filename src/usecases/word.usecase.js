@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const UserType = require('../models/userType.model');
 const Image = require('../controllers/s3saveImage.controller');
 const mongoose = require ('mongoose');
+const wordMail = require('../services/sendgrid');
 
 // Función de consulta de todos los Words y filtrado por palabra
 async function getWords(action, userName) {
@@ -272,11 +273,12 @@ async function getWordsById(request) {
 async function setWord(request) {
   const {data, urlImage} = request;
 
+  let url;
   const newData = JSON.parse(data);
   const {word, type, userId, imgUser, userName, meaning, example, language, country, state, topic, translations, createdAt, likes, userValidator, status, reason, complements} = newData;    
   
   
-  if(urlImage.path !== undefined) url = await Image.upload(urlImage);
+  if(urlImage?.path !== undefined) url = await Image.upload(urlImage);
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -310,7 +312,7 @@ async function setWord(request) {
     }
  
     // Aquí actualiza el número de registros en validación del usuario 
-    await User.findOneAndUpdate(
+    const userCreator = await User.findOneAndUpdate(
       {
         _id: userId,
       },
@@ -318,12 +320,19 @@ async function setWord(request) {
         $inc: {
           inValidation: validation
         }
+      },
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: true,
+        returnNewDocument: true,
       }
     );
-
-    return true;
+    
+    return userCreator;
   }
   catch(error){
+    console.log(error);
     // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
     await session.abortTransaction();
     return false;
@@ -350,7 +359,9 @@ async function setNewItem (request) {
 
   const {action, idComplement, newArray} = newData;
   const {userId, translations} = newArray;
-  
+
+  let userCreator;
+
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -394,7 +405,7 @@ async function setNewItem (request) {
           );          
         }  
         // Aquí actualiza el número de registros en validación del usuario 
-        await User.findOneAndUpdate(
+        userCreator = await User.findOneAndUpdate(
           {
             _id: userId,
           },
@@ -402,6 +413,12 @@ async function setNewItem (request) {
             $inc: {
               inValidation: 1
             }
+          },
+          {
+            new: true,
+            runValidators: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
           }
         );
         break;
@@ -433,7 +450,7 @@ async function setNewItem (request) {
         }
   
         // Aquí actualiza el número de registros en validación del usuario 
-        await User.findOneAndUpdate(
+        userCreator = await User.findOneAndUpdate(
           {
             _id: userId,
           },
@@ -441,7 +458,13 @@ async function setNewItem (request) {
             $inc: {
               inValidation: validation
             }
-          }
+          },
+          {
+            new: true,
+            runValidators: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
+          }          
         ); 
         
         break;    
@@ -449,7 +472,7 @@ async function setNewItem (request) {
         return "Invalid Action"
     } 
     
-    return true;
+    return userCreator;
   }
   catch(error){
     // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
@@ -591,6 +614,7 @@ async function updateStatus(request) {
 
   const {id, userId, idComplement, idTranslate, nameValidator, status, reason} = request;
 
+  let userCreator;
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -695,7 +719,7 @@ async function updateStatus(request) {
           }
         }
         // Se incrementa en 1 el campo de registros validados y de los puntos de usuario y a la vez se decrementa en 1 el campo de registros en validación
-        await User.findOneAndUpdate(
+        userCreator = await User.findOneAndUpdate(
           {
             _id: userId,
           },
@@ -705,7 +729,13 @@ async function updateStatus(request) {
               validated: 1,
               points: 1
             }
-          }
+          },
+          {
+            new: true,
+            runValidators: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
+          } 
         );
         const user = await User.findById(userId);
         const userType = await UserType.findOne({userType: "Moderador"});
@@ -821,7 +851,7 @@ async function updateStatus(request) {
           }
         }
         // Se decrementa en 1 el campo de registros en validación y se incrementa en 1 el de canceladoss
-        await User.findOneAndUpdate(
+        userCreator = await User.findOneAndUpdate(
           {
             _id: userId,
           },
@@ -830,13 +860,19 @@ async function updateStatus(request) {
               inValidation: -1,
               canceled: 1
             }
-          }
+          },
+          {
+            new: true,
+            runValidators: true,
+            useFindAndModify: true,
+            returnNewDocument: true,
+          }    
         );         
         break;
       default:
         return "Invalid Action"
     }
-    return true;
+    return userCreator;
   }
   catch(error){
    // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido

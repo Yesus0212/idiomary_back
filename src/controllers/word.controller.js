@@ -1,4 +1,5 @@
 const Word = require('../usecases/word.usecase');
+const wordMail = require('../templates/newInput');
 
 // Obtiene la información 
 async function getWord(request, response) {
@@ -53,18 +54,22 @@ async function setWord(request, response) {
         const {data, urlImage} = request.body;
         const createWord = await Word.setWord({data, urlImage});
 
+        console.log(createWord);
+
         if(!createWord){
             response.statusCode = 412;
             response.json({
                 success: false,
-                createWord
+                message: "No new entry was set"
             });            
         }
         else{
+            const sendMail = await wordMail.newInput(createWord.userName, createWord.email);
+            console.log(sendMail, "Send Mail");
             response.statusCode = 200;
             response.json({
                 success: true,
-                createWord
+                message: "New correct entry was set"
             });
         }
     }
@@ -116,14 +121,16 @@ async function setNewItemWord(request, response) {
             response.statusCode = 412;
             response.json({
                 success: false,
-                newItem
+                message: "No new entry was set",
             });            
         }
         else{
+            const sendMail = await wordMail.newInput(newItem.userName, newItem.email);
+            console.log(sendMail, "Send Mail");
             response.statusCode = 200;
             response.json({
                 success: true,
-                newItem
+                message: "New correct entry was set",
             });
         }
     }
@@ -179,14 +186,16 @@ async function updateStatusWord(request, response) {
             response.statusCode = 412;
             response.json({
                 success: false,
-                newStatus
+                message: "No new status was set",
             });            
         }
         else{
+            const sendMail = await wordMail.newStatusInput(newStatus.userName, newStatus.email, status);
+            console.log(sendMail, "Send Mail");
             response.statusCode = 200;
             response.json({
                 success: true,
-                newStatus
+                message: "New correct estatus was set",
             });
         }
     }

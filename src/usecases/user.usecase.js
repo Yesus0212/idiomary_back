@@ -32,7 +32,7 @@ async function getUsersById(request) {
 
 // Función de inserción de user nuevo
 async function setUser(request) {
-  const {userName, email, password, language, country, state, urlImage, userType, points, filters} = request;    
+  const {userName, email, password, language, country, state, urlImage, userType, points, filters, likes} = request;    
   const setUser = await User.create({
       userName,
       email,
@@ -40,7 +40,7 @@ async function setUser(request) {
       language,
       country,
       state,
-      urlImage,
+      urlImage: "https://idiomary.s3.amazonaws.com/avatar_pre/avatar.png",
       userType, 
       points,
       filters, 
@@ -53,6 +53,11 @@ async function setUser(request) {
     process.env.API_KEY,
     { expiresIn: process.env.TOKEN_EXPIRES},
   );
+
+  if(token){
+    const sendMail = await mailUser.registerMail(userName, email);
+    console.log(sendMail)
+  }
 
   return {
     userId: setUser._id,
