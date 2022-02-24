@@ -144,10 +144,11 @@ async function setNewData(request) {
     
   if(urlImage?.path !== undefined) url = await Image.upload(urlImage);
 
-  const session = await mongoose.startSession()
-  session.startTransaction()
+  const session = await mongoose.startSession();
 
-  try{
+  try{    
+    session.startTransaction();
+
     const update = await User.findOneAndUpdate(
       {
         _id: id,
@@ -190,13 +191,15 @@ async function setNewData(request) {
       }
     );
 
+    session.endSession();
     return update;
   }
   catch(error){
     console.log(error);
     // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
     await session.abortTransaction()  
-   return false
+    session.endSession();
+    return false;
   } finally {
     // Finaliza la session
     session.endSession()

@@ -281,9 +281,9 @@ async function setWord(request) {
   if(urlImage?.path !== undefined) url = await Image.upload(urlImage);
 
   const session = await mongoose.startSession();
-  session.startTransaction();
+  try{    
+    session.startTransaction();
 
-  try{
     await Word.create({
       word,
       type,
@@ -328,13 +328,15 @@ async function setWord(request) {
         returnNewDocument: true,
       }
     );
-    
+
+    session.endSession();    
     return userCreator;
   }
   catch(error){
     console.log(error);
     // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
     await session.abortTransaction();
+    session.endSession();
     return false;
   } finally {
     // Finaliza la session
@@ -362,10 +364,11 @@ async function setNewItem (request) {
 
   let userCreator;
 
-  const session = await mongoose.startSession()
-  session.startTransaction()
+  const session = await mongoose.startSession();
 
   try{
+    session.startTransaction();
+
     switch (action) {
       case "translate":
         if(idComplement !== ""){
@@ -470,14 +473,16 @@ async function setNewItem (request) {
         break;    
       default:
         return "Invalid Action"
-    } 
+    }
     
+    session.endSession();    
     return userCreator;
   }
   catch(error){
     // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
     console.log(error);
     await session.abortTransaction();
+    session.endSession();
     return false;
   } finally {
     // Finaliza la session
@@ -614,11 +619,13 @@ async function updateStatus(request) {
 
   const {id, userId, idComplement, idTranslate, nameValidator, status, reason} = request;
 
-  let userCreator;
-  const session = await mongoose.startSession()
-  session.startTransaction()
+  let userCreator;  
 
-  try {
+  const session = await mongoose.startSession();
+
+  try {    
+    session.startTransaction();
+
     switch (status) {
       case 2:
         if(idComplement !== ""){
@@ -872,11 +879,14 @@ async function updateStatus(request) {
       default:
         return "Invalid Action"
     }
+
+    session.endSession();
     return userCreator;
   }
   catch(error){
    // Si ocurre un error, aborta la transacción y deshacer cualquier cambio que pudiera haber ocurrido
    await session.abortTransaction()  
+   session.endSession();
    return false
   } finally {
    // Finaliza la session
